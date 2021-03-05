@@ -31,10 +31,12 @@ std::vector<Process> SeqGenerator::generateProccesses(unsigned short n, double l
     arrivalTime = floorNextExp(lambda, maxval);
     numBursts = randNumBursts(); 
     std::vector<unsigned int> cpuBurstTimes(numBursts);
-    std::vector<unsigned int> ioBurstTimes(numBursts);
+    std::vector<unsigned int> ioBurstTimes(numBursts - 1);
     for (unsigned int j = 0; j < numBursts; ++j) {
       cpuBurstTimes[j] = ceilNextExp(lambda, maxval);
-      ioBurstTimes[j] = 10 * ceilNextExp(lambda, maxval); 
+      if (j + 1 != numBursts) {
+        ioBurstTimes[j] = 10 * ceilNextExp(lambda, maxval); 
+      }
     }
     processes.push_back(Process(arrivalTime, cpuBurstTimes, ioBurstTimes)); 
   }

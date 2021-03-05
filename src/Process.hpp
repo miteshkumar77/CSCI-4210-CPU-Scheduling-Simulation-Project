@@ -6,19 +6,23 @@
 #include <stdexcept>
 #include <iostream>
 
-enum State : short {RUNNING, READY, WAITING}; 
+enum class State: char {UNARRIVED, READY, WAITING, RUNNING, TERMINATED};
 
 class Process {
 
 public:
-Process(unsigned int arrivalTime, 
-  const std::vector<unsigned int>& cpuBurstTimes, 
-  const std::vector<unsigned int>& ioBurstTimes); 
+  Process(unsigned int arrivalTime, 
+    const std::vector<unsigned int>& cpuBurstTimes, 
+    const std::vector<unsigned int>& ioBurstTimes); 
 
-void printProcess();
 
+  int getArrivalTime() const { return arrivalTime; }
+  char getPid() const { return pid; }
+  void printProcess();
+  void reset();
+  void nextState();
+  void terminate(); 
 private:
-
   static char gpid; 
   const unsigned int arrivalTime;
   const char pid;
@@ -27,7 +31,7 @@ private:
   std::vector<unsigned int> cpuBurstTimes;
   std::vector<unsigned int> ioBurstTimes;
   unsigned int burstIdx = 0;
-
+  State processState;
 };
 
 
