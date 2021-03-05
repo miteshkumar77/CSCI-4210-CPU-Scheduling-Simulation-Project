@@ -4,6 +4,7 @@
 #include <vector>
 #include <exception>
 #include <stdexcept>
+#include <iostream>
 
 enum State : short {RUNNING, READY, WAITING}; 
 
@@ -13,6 +14,8 @@ public:
 Process(unsigned int arrivalTime, 
   const std::vector<unsigned int>& cpuBurstTimes, 
   const std::vector<unsigned int>& ioBurstTimes); 
+
+void printProcess();
 
 private:
 

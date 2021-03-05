@@ -21,12 +21,13 @@ unsigned int SeqGenerator::ceilNextExp(double lambda, double maxval) {
   return res;
 }
 
-std::vector<Process> SeqGenerator::generateProccesses(unsigned short int n, double lambda, double maxval) {
+std::vector<Process> SeqGenerator::generateProccesses(unsigned short n, double lambda, double maxval) {
   unsigned int arrivalTime;
   unsigned int numBursts;
   std::vector<Process> processes;
   processes.reserve(n); 
-  for (int i = 0; i < n; ++i) {
+  for (unsigned short i = 0; i < n; ++i) {
+
     arrivalTime = floorNextExp(lambda, maxval);
     numBursts = randNumBursts(); 
     std::vector<unsigned int> cpuBurstTimes(numBursts);

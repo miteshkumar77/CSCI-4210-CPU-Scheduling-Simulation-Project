@@ -6,6 +6,7 @@
 
 int main(int argc, char** argv) {
 
-  std::cout << "Hello World..." << std::endl;
+  std::vector<Process> processes = SeqGenerator::generateProccesses(26, 0.01, 3000); 
+  for (auto& process : processes) process.printProcess(); 
   return EXIT_SUCCESS; 
 }

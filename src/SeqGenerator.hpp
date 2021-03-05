@@ -14,7 +14,7 @@ namespace SeqGenerator {
   inline unsigned int randNumBursts(); 
   unsigned int floorNextExp(double lambda, double maxval);
   unsigned int ceilNextExp(double lambda, double maxval);
-  std::vector<Process> generateProccesses(unsigned short int n, 
+  std::vector<Process> generateProccesses(unsigned short n, 
     double lambda, double maxval); 
 }
 
