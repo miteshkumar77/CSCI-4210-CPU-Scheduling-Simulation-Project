@@ -20,12 +20,15 @@ private:
   ProcessPtr peekLastReady() const;
   ProcessPtr peekFirstReady() const;
   void popFirstReady(); 
-  void pushLastReady(ProcessPtr processPtr) { readyQueue.push_back(processPtr); } 
-  void pushFirstReady(ProcessPtr processPtr) { readyQueue.push_front(processPtr); }
+  void pushLastReady(ProcessPtr processPtr);
+  void pushFirstReady(ProcessPtr processPtr);
   bool isReadyQueueEmpty() const;
   void resetCtxSwitchDelay();
   void resetBurstTimer();
-  void preempt(bool front); 
+  Process::State decrementBurstTimer();
+  void decrementCtxSwitchTimer(); 
+  void preemptRunningProc(); 
+  inline bool burstTimerElapsed() const { return burstRemaining == 0; }
   static const std::function<bool(const ProcessPtr&, const ProcessPtr&)> processArrivalComparator; 
   static const std::function<bool(const ioQueueElem&, const ioQueueElem&)> processIoComparator;
   std::vector<ProcessPtr> orderedProcesses;
@@ -39,6 +42,7 @@ private:
   unsigned int ctxSwitchRemaining;
   bool addToEnd = true;
   unsigned int numProcs;
+  unsigned int numPreempts;
   ProcessPtr runningProc;
   const ProcessPtr nullProc;
 };

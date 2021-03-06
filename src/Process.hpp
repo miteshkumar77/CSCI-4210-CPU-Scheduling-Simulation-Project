@@ -16,7 +16,6 @@ public:
     const std::vector<unsigned int>& ioBurstTimes); 
 
   enum class State: char {UNARRIVED, READY, WAITING, RUNNING, TERMINATED};
-
   int getArrivalTime() const { return arrivalTime; }
   unsigned int getCurrIoBurstTime() const;
   char getPid() const { return pid; }

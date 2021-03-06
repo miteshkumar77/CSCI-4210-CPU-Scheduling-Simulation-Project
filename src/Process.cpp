@@ -86,6 +86,7 @@ unsigned int Process::getCurrIoBurstTime() const {
 
   return ioBurstTimes[burstIdx - 1];
 }
+
 void Process::printProcess() {
   std::cout << "pid: " << pid << std::endl;
   std::cout << "arrival time: " << arrivalTime << std::endl;

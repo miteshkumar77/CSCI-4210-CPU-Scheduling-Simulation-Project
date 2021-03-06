@@ -58,11 +58,45 @@ void RoundRobin::popFirstReady() {
   readyQueue.pop_front(); 
 }
 
+Process::State RoundRobin::decrementBurstTimer() {
+  if (burstRemaining == 0) {
+    throw std::runtime_error("Error: decrementBurstTimer() was called on a fully elapsed burst timer.");
+  }
+  if (runningProc == nullProc) {
+    throw std::runtime_error("Error: decrementBurstTimer() was called without a process in the CPU.");
+  }
+  if (runningProc -> getState() != Process::State::RUNNING) {
+    throw std::runtime_error("Error: decrementBurstTimer() was called without a process in RUNNING state.");
+  }
+  
+  --burstRemaining;
+  return runningProc -> decrementBurst();
+}
+void RoundRobin::decrementCtxSwitchTimer() {
+  if (ctxSwitchRemaining == 0) {
+    throw std::runtime_error("Error: decrementCtxSwitchTimer() was called on a fully elapsed ctx switch timer.");
+  }
+  --ctxSwitchRemaining;
+}
+
+void RoundRobin::preemptRunningProc() {
+  if (isReadyQueueEmpty()) {
+    throw std::runtime_error("Error: preemptRunningProc() called when ready queue was empty.");
+  }
+  if (runningProc == nullProc) {
+    throw std::runtime_error("Error: preemptRunningProc() called when there was no runningProc.");
+  }
+  if (runningProc -> getState() != Process::State::RUNNING) {
+    throw std::runtime_error("Error: preemptRunningProc() called for a non-running process.");
+  }
+  runningProc -> preempt();
+  ++numPreempts;
+}
 
 bool RoundRobin::tick() {
   
   if (ctxSwitchRemaining) {
-    --ctxSwitchRemaining;
+    decrementCtxSwitchTimer();
   } else {
     if (runningProc == nullProc) {
       if (!isReadyQueueEmpty()) {
@@ -82,12 +116,11 @@ bool RoundRobin::tick() {
         std::cout << static_cast<int>(runningProc -> getState()) << std::endl;
         throw std::runtime_error("Error: Process on CPU is not in RUNNING state.");
       }
-      --burstRemaining;
-      Process::State currState = runningProc -> decrementBurst();
+      Process::State currState = decrementBurstTimer();
       if (currState == Process::State::RUNNING) {
-        if (burstRemaining == 0) {
+        if (burstTimerElapsed()) {
           if (!isReadyQueueEmpty()) {  
-            runningProc -> preempt();
+            preemptRunningProc();
             resetCtxSwitchDelay();
             pushLastReady(runningProc);
             runningProc = nullProc;
@@ -128,6 +161,20 @@ bool RoundRobin::tick() {
   }
   ++timestamp;
   return true; // Simulation continues
+}
+
+void RoundRobin::pushLastReady(RoundRobin::ProcessPtr processPtr) { 
+  if (processPtr -> getState() != Process::State::READY) {
+    throw std::runtime_error("Error: pushLastReady() called for process that wasn't in the READY state."); 
+  }
+  readyQueue.push_back(processPtr); 
+}   
+
+void RoundRobin::pushFirstReady(RoundRobin::ProcessPtr processPtr) {
+  if (processPtr -> getState() != Process::State::READY) {
+    throw std::runtime_error("Error: pushFirstReady() called for process that wasn't in the READY state."); 
+  }
+  readyQueue.push_front(processPtr); 
 }
 
 void RoundRobin::resetBurstTimer() {

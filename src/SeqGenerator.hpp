@@ -9,7 +9,6 @@
 
 namespace SeqGenerator {
   
-  inline void seed(long int seedval) { srand48(seedval); }
   inline double nextExp(double lambda); 
   inline unsigned int randNumBursts(); 
   unsigned int floorNextExp(double lambda, double maxval);
