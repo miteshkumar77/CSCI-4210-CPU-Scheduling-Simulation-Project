@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <iostream>
 
-enum class State: char {UNARRIVED, READY, WAITING, RUNNING, TERMINATED};
+
 
 class Process {
 
@@ -15,9 +15,14 @@ public:
     const std::vector<unsigned int>& cpuBurstTimes, 
     const std::vector<unsigned int>& ioBurstTimes); 
 
+  enum class State: char {UNARRIVED, READY, WAITING, RUNNING, TERMINATED};
 
   int getArrivalTime() const { return arrivalTime; }
+  unsigned int getCurrIoBurstTime() const;
   char getPid() const { return pid; }
+  State decrementBurst();
+  State getState() const { return processState; }
+  void preempt();
   void printProcess();
   void reset();
   void nextState();

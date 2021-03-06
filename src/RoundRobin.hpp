@@ -11,18 +11,20 @@
 #include "Process.hpp"
 #include <utility>
 class RoundRobin {
-
+public:
+  RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int ctxSwitchDelay); 
+  bool tick(); 
 private:
   typedef std::vector<Process>::iterator ProcessPtr; 
   typedef std::pair<unsigned int, ProcessPtr> ioQueueElem; 
-  RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int ctxSwitchDelay); 
   ProcessPtr peekLastReady() const;
   ProcessPtr peekFirstReady() const;
   void popFirstReady(); 
   void pushLastReady(ProcessPtr processPtr) { readyQueue.push_back(processPtr); } 
   void pushFirstReady(ProcessPtr processPtr) { readyQueue.push_front(processPtr); }
   bool isReadyQueueEmpty() const;
-  bool tick(); 
+  void resetCtxSwitchDelay();
+  void resetBurstTimer();
   void preempt(bool front); 
   static const std::function<bool(const ProcessPtr&, const ProcessPtr&)> processArrivalComparator; 
   static const std::function<bool(const ioQueueElem&, const ioQueueElem&)> processIoComparator;
@@ -37,6 +39,8 @@ private:
   unsigned int ctxSwitchRemaining;
   bool addToEnd = true;
   unsigned int numProcs;
+  ProcessPtr runningProc;
+  const ProcessPtr nullProc;
 };
 
 #endif

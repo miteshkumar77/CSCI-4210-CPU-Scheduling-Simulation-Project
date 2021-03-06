@@ -6,7 +6,7 @@ inline double SeqGenerator::nextExp(double lambda) {
 }
 
 inline unsigned int SeqGenerator::randNumBursts() {
-  return drand48() * 100; 
+  return 1 + drand48() * 100; 
 }
 
 unsigned int SeqGenerator::floorNextExp(double lambda, double maxval) {
@@ -17,7 +17,7 @@ unsigned int SeqGenerator::floorNextExp(double lambda, double maxval) {
 
 unsigned int SeqGenerator::ceilNextExp(double lambda, double maxval) {
   double res = std::numeric_limits<unsigned int>::max(); 
-  while(res > maxval) res = floor(nextExp(lambda));
+  while(res > maxval) res = ceil(nextExp(lambda));
   return res;
 }
 
