@@ -21,7 +21,8 @@ unsigned int SeqGenerator::ceilNextExp(double lambda, double maxval) {
   return res;
 }
 
-std::vector<Process> SeqGenerator::generateProccesses(unsigned short n, double lambda, double maxval) {
+std::vector<Process> SeqGenerator::generateProccesses(unsigned short n, double lambda, double maxval, long int seedval) {
+  srand48(seedval); 
   unsigned int arrivalTime;
   unsigned int numBursts;
   std::vector<Process> processes;

@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv) {
 
-  std::vector<Process> processes = SeqGenerator::generateProccesses(5, 0.01, 10); 
+  std::vector<Process> processes = SeqGenerator::generateProccesses(26, 0.01, 3000, 1123421); 
   RoundRobin rr(processes, 1, 2); 
 
   std::cout << "Beginning simulation..." << std::endl;
