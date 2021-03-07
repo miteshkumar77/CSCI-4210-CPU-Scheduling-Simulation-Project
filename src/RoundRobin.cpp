@@ -24,7 +24,6 @@ RoundRobin::RoundRobin(std::vector<Process>& processes,
   numProcs(processes.size()),
   runningProc(processes.end()),
   nullProc(processes.end()) {
-
   orderedProcesses.reserve(processes.size()); 
   for (auto it = processes.begin(); it != processes.end(); ++it)
     orderedProcesses.push_back(it);
@@ -70,7 +69,7 @@ Process::State RoundRobin::decrementBurstTimer() {
   }
   
   --burstRemaining;
-  return runningProc -> decrementBurst();
+  return runningProc -> decrementBurst(timestamp, ctxSwitchDelay);
 }
 void RoundRobin::decrementCtxSwitchTimer() {
   if (ctxSwitchRemaining == 0) {
@@ -89,12 +88,11 @@ void RoundRobin::preemptRunningProc() {
   if (runningProc -> getState() != Process::State::RUNNING) {
     throw std::runtime_error("Error: preemptRunningProc() called for a non-running process.");
   }
-  runningProc -> preempt();
+  runningProc -> preempt(timestamp, ctxSwitchDelay);
   ++numPreempts;
 }
 
 bool RoundRobin::tick() {
-  
   if (ctxSwitchRemaining) {
     decrementCtxSwitchTimer();
   } else {
@@ -103,13 +101,17 @@ bool RoundRobin::tick() {
         runningProc = peekFirstReady();
         popFirstReady();
         resetCtxSwitchDelay();
+        if (!ctxSwitchRemaining) {
+          return tick(); 
+        }
+        --ctxSwitchRemaining; 
       } else if (latestProcessIdx == numProcs && ioQueue.empty()) {
         return false; // Simulation is over.
       }
     } else {
       if (runningProc -> getState() == Process::State::READY) {
         resetBurstTimer();
-        runningProc -> nextState();
+        runningProc -> nextState(timestamp, ctxSwitchDelay);
       }
 
       if (runningProc -> getState() != Process::State::RUNNING) {
@@ -140,24 +142,27 @@ bool RoundRobin::tick() {
   }
   
   while(!ioQueue.empty() && ioQueue.top().first <= timestamp) {
+    ioQueue.top().second -> nextState(timestamp, ctxSwitchDelay); 
     if (addToEnd) {
       pushLastReady(ioQueue.top().second);
     } else {
       pushFirstReady(ioQueue.top().second); 
     }
-    ioQueue.top().second -> nextState(); 
     ioQueue.pop(); 
   }
 
   while(latestProcessIdx < numProcs && 
     orderedProcesses[latestProcessIdx] -> getArrivalTime() <= timestamp) {
-    orderedProcesses[latestProcessIdx] -> nextState(); 
+    orderedProcesses[latestProcessIdx] -> nextState(timestamp, ctxSwitchDelay); 
     if (addToEnd) {
       pushLastReady(orderedProcesses[latestProcessIdx]); 
     } else {
       pushFirstReady(orderedProcesses[latestProcessIdx]); 
     }
     ++latestProcessIdx;
+  }
+  for (ProcessPtr p: orderedProcesses) {
+    p -> makeEntry();
   }
   ++timestamp;
   return true; // Simulation continues

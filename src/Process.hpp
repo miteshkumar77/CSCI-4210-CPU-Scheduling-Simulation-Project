@@ -19,27 +19,26 @@ public:
   int getArrivalTime() const { return arrivalTime; }
   unsigned int getCurrIoBurstTime() const;
   char getPid() const { return pid; }
-  State decrementBurst();
+  State decrementBurst(unsigned int timestamp, unsigned int ctxSwitchDelay);
   State getState() const { return processState; }
-  void preempt();
+  void preempt(unsigned int timestamp, unsigned int ctxSwitchDelay);
   void printProcess();
   void reset();
-  void nextState();
-  void terminate(); 
+  void nextState(unsigned int timestamp, unsigned int ctxSwitchDelay);
+  void terminate(unsigned int timestamp, unsigned int ctxSwitchDelay); 
+  void makeEntry(); 
 private:
   static char gpid; 
   const unsigned int arrivalTime;
   const char pid;
   const std::vector<unsigned int> originalCpuBurstTimes;
   const std::vector<unsigned int> originalIoBurstTimes;
+  std::vector<unsigned int> turnaroundTimes;
   std::vector<unsigned int> cpuBurstTimes;
-  std::vector<unsigned int> ioBurstTimes;
+  std::vector<unsigned int> waitTimes;
+  std::vector<char> log;
   unsigned int burstIdx = 0;
+  unsigned int timeJoinedReadyQueue = 0;
   State processState;
 };
-
-
-
-
-
 #endif

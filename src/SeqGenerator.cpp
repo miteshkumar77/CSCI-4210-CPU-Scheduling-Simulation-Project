@@ -21,6 +21,44 @@ unsigned int SeqGenerator::ceilNextExp(double lambda, double maxval) {
   return res;
 }
 
+std::vector<Process> SeqGenerator::parseProcesses(std::string fname) {
+  FILE* fp;
+  if (NULL == (fp = fopen(fname.c_str(), "r"))) {
+    throw std::runtime_error("Error: could not open file.");
+  }
+
+  
+
+  unsigned int n;
+  unsigned int arrivalTime;
+  unsigned int nCpuBursts;
+  unsigned int nIoBursts;
+
+  fscanf(fp, "%u", &n);
+  std::vector<Process> processes;
+  processes.reserve(n); 
+  for (int i = 0; i < n; ++i) {
+    fscanf(fp, "%u", &arrivalTime);
+    fscanf(fp, "%u", &nCpuBursts);
+    if (nCpuBursts == 0) {
+      throw std::runtime_error("Error: nCpuBursts was 0.");
+    }
+    nIoBursts = nCpuBursts - 1;
+    std::vector<unsigned int> cpuBurstTimes(nCpuBursts);
+    std::vector<unsigned int> ioBurstTimes(nIoBursts);
+    for (unsigned int j = 0; j < nCpuBursts; ++j) {
+      fscanf(fp, "%u", &cpuBurstTimes[j]); 
+    }
+
+    for (unsigned int j = 0; j < nIoBursts; ++j) {
+      fscanf(fp, "%u", &ioBurstTimes[j]); 
+    }
+    processes.push_back(Process(arrivalTime, cpuBurstTimes, ioBurstTimes)); 
+  }
+
+  return processes;
+}
+
 std::vector<Process> SeqGenerator::generateProccesses(unsigned short n, double lambda, double maxval, long int seedval) {
   srand48(seedval); 
   unsigned int arrivalTime;

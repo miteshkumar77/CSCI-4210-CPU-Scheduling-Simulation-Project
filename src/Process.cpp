@@ -9,8 +9,9 @@ Process::Process(unsigned int arrivalTime,
   pid(++gpid), 
   originalCpuBurstTimes(std::vector<unsigned int>(cpuBurstTimes.begin(), cpuBurstTimes.end())),
   originalIoBurstTimes(std::vector<unsigned int>(ioBurstTimes.begin(), ioBurstTimes.end())),
+  turnaroundTimes(std::vector<unsigned int>(cpuBurstTimes.size())),
   cpuBurstTimes(std::move(cpuBurstTimes)),
-  ioBurstTimes(std::move(ioBurstTimes)),
+  waitTimes(std::vector<unsigned int>(cpuBurstTimes.size())),
   processState(State::UNARRIVED) {
   
   if (gpid > 'Z') {
@@ -19,24 +20,22 @@ Process::Process(unsigned int arrivalTime,
   }
 }
 
-
-
 void Process::reset() {
   burstIdx = 0;
   int n = cpuBurstTimes.size(); 
   for (int i = 0; i < n; ++i) {
-    cpuBurstTimes[i] = originalIoBurstTimes[i];
-  }
-
-  for (int i = 0; i < n; ++i) {
-    ioBurstTimes[i] = ioBurstTimes[i];
+    cpuBurstTimes[i] = originalCpuBurstTimes[i];
   }
 }
 
-void Process::nextState() {
+void Process::nextState(unsigned int timestamp, unsigned int ctxSwitchDelay) {
   if (processState == State::UNARRIVED || processState == State::WAITING) {
+    waitTimes[burstIdx] = 0; // Clear any existing data
+    turnaroundTimes[burstIdx] = timestamp; // Start tracking turnaround time
+    timeJoinedReadyQueue = timestamp + 1;
     processState = State::READY; 
   } else if (processState == State::READY) {
+    waitTimes[burstIdx] += timestamp - timeJoinedReadyQueue;
     processState = State::RUNNING;
   } else if (processState == State::RUNNING) {
     processState = State::WAITING; 
@@ -45,20 +44,44 @@ void Process::nextState() {
   }
 }
 
-void Process::terminate() {
+void Process::makeEntry() {
+  switch(processState) {
+    case State::RUNNING:
+      log.push_back('X');
+      break;
+    case State::UNARRIVED:
+      log.push_back('O');
+      break;
+    case State::WAITING:
+      log.push_back('W');
+      break;
+    case State::READY:
+      log.push_back(' ');
+      break;
+    case State::TERMINATED:
+      log.push_back('T');
+      break;
+    default:
+      log.push_back('?');
+      break;
+  }
+}
+
+void Process::terminate(unsigned int timestamp, unsigned int ctxSwitchDelay) {
   if (processState != State::RUNNING) {
     throw std::runtime_error("Error: terminate() called for a non-running process.");
   }
   processState = State::TERMINATED; 
 }
-void Process::preempt() {
+void Process::preempt(unsigned int timestamp, unsigned int ctxSwitchDelay) {
   if (processState != State::RUNNING) {
     throw std::runtime_error("Error: preempt() called for a non-running process.");
   }
+  timeJoinedReadyQueue = timestamp + 1;
   processState = State::READY;
 }
 
-Process::State Process::decrementBurst() {
+Process::State Process::decrementBurst(unsigned int timestamp, unsigned int ctxSwitchDelay) {
   if (processState != State::RUNNING) {
     throw std::runtime_error("Error: Tried to decrement burst for a non-running process.");
   }
@@ -67,10 +90,11 @@ Process::State Process::decrementBurst() {
     throw std::runtime_error("Error: Tried to decrement with burstIdx out of bounds.");
   }
   if (0 == --cpuBurstTimes[burstIdx]) {
+    turnaroundTimes[burstIdx] = timestamp - turnaroundTimes[burstIdx] + ctxSwitchDelay;
     if (++burstIdx == cpuBurstTimes.size()) {
-      terminate(); 
+      terminate(timestamp, ctxSwitchDelay); 
     } else {
-      nextState(); 
+      nextState(timestamp, ctxSwitchDelay); 
     }
   }
   return processState; 
@@ -84,18 +108,35 @@ unsigned int Process::getCurrIoBurstTime() const {
     throw std::runtime_error("Error: burstIdx was unexpectedly 0 when trying to get IoBurstTime.");
   }
 
-  return ioBurstTimes[burstIdx - 1];
+  return originalIoBurstTimes[burstIdx - 1];
 }
 
 void Process::printProcess() {
-  std::cout << "pid: " << pid << std::endl;
+  std::cout << "pid: " << pid << " ";
+  for (auto i : log) std::cout << i;
+  std::cout << std::endl;
   std::cout << "arrival time: " << arrivalTime << std::endl;
+
   std::cout << "current burst index: " << burstIdx << std::endl;
-  std::cout << "cpu burst times: ";
+
+  std::cout << "remaining cpu burst times: ";
   for (auto i : cpuBurstTimes) std::cout << i << ' ';
   std::cout << std::endl;
+
+  std::cout << "original cpu burst times: ";
+  for (auto i : originalCpuBurstTimes) std::cout << i << ' ';
+  std::cout << std::endl;
+
   std::cout << "io burst times: ";
-  for (auto i : ioBurstTimes) std::cout << i << ' ';
+  for (auto i : originalIoBurstTimes) std::cout << i << ' ';
+  std::cout << std::endl;
+
+  std::cout << "turnaround times: ";
+  for (auto i : turnaroundTimes) std::cout << i << ' ';
+  std::cout << std::endl;
+
+  std::cout << "wait times: ";
+  for (auto i : waitTimes) std::cout << i << ' ';
   std::cout << std::endl;
   std::cout << std::endl;
 }

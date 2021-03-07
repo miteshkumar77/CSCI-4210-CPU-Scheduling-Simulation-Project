@@ -1,23 +1,23 @@
 #include <stdlib.h>
 #include <iostream>
+#include <limits>
 #include "SeqGenerator.hpp"
 #include "Process.hpp"
 #include "RoundRobin.hpp"
 
 int main(int argc, char** argv) {
 
-  std::vector<Process> processes = SeqGenerator::generateProccesses(26, 0.01, 30, 1123421); 
-  RoundRobin rr(processes, 300000, 2); 
+  std::vector<Process> processes = SeqGenerator::parseProcesses("test_input.txt"); 
+  RoundRobin rr(processes, /* tslice: */ 3, /* tcs: */ 0); 
 
   std::cout << "Beginning simulation..." << std::endl;
-  for (int i = 0; i < 1000000; ++i) {
+  for (int i = 0; i < std::numeric_limits<int>::max(); ++i) {
     if (!rr.tick()) {
       std::cout << "RR Simulation ended after " << i << "ms." << std::endl;
-      return EXIT_SUCCESS;
+      break;
     }
   }
 
-  std::cout << "RR Simulation didn't end after " << 100000 << "ms." << std::endl;
   for (auto& process : processes) process.printProcess(); 
   return EXIT_SUCCESS; 
 }

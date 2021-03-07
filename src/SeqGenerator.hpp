@@ -6,6 +6,12 @@
 #include <math.h>
 #include "Process.hpp"
 #include <limits>
+#include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
 
 namespace SeqGenerator {
   
@@ -15,6 +21,7 @@ namespace SeqGenerator {
   unsigned int ceilNextExp(double lambda, double maxval);
   std::vector<Process> generateProccesses(unsigned short n, double lambda, 
     double maxval, long int seedval);
+  std::vector<Process> parseProcesses(std::string fname); 
 }
 
 #endif

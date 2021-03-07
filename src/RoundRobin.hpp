@@ -42,7 +42,8 @@ private:
   unsigned int ctxSwitchRemaining;
   bool addToEnd = true;
   unsigned int numProcs;
-  unsigned int numPreempts;
+  unsigned int numPreempts = 0;
+  unsigned int numCtxSwitches = 0;
   ProcessPtr runningProc;
   const ProcessPtr nullProc;
 };
