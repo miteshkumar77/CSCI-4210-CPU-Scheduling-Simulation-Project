@@ -8,15 +8,13 @@
 int main(int argc, char** argv) {
 
   std::vector<Process> processes = SeqGenerator::parseProcesses("test_input.txt"); 
-  RoundRobin rr(processes, /* tslice: */ 3, /* tcs: */ 0); 
-
-  std::cout << "Beginning simulation..." << std::endl;
-  for (int i = 0; i < std::numeric_limits<int>::max(); ++i) {
-    if (!rr.tick()) {
-      std::cout << "RR Simulation ended after " << i << "ms." << std::endl;
-      break;
-    }
+  RoundRobin rr(processes, /* tslice: */ 3, /* tcs: */ 2); 
+  // std::cout << "Beginning Simulation..." << std::endl;
+  for (auto& p : processes) {
+    p.makeEntry(); 
   }
+  while(rr.tick()); 
+  rr.printInfo(); 
 
   for (auto& process : processes) process.printProcess(); 
   return EXIT_SUCCESS; 

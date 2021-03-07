@@ -112,7 +112,7 @@ unsigned int Process::getCurrIoBurstTime() const {
 }
 
 void Process::printProcess() {
-  std::cout << "pid: " << pid << " ";
+  std::cout << "pid: " << pid << " |";
   for (auto i : log) std::cout << i;
   std::cout << std::endl;
   std::cout << "arrival time: " << arrivalTime << std::endl;

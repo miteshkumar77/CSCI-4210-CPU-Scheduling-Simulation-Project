@@ -27,6 +27,7 @@ public:
   void nextState(unsigned int timestamp, unsigned int ctxSwitchDelay);
   void terminate(unsigned int timestamp, unsigned int ctxSwitchDelay); 
   void makeEntry(); 
+  unsigned int getCurrCpuBurstTime() const { return burstIdx == cpuBurstTimes.size()?0:cpuBurstTimes[burstIdx]; }
 private:
   static char gpid; 
   const unsigned int arrivalTime;

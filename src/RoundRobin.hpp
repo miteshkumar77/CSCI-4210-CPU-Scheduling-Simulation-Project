@@ -14,6 +14,7 @@ class RoundRobin {
 public:
   RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int ctxSwitchDelay); 
   bool tick(); 
+  void printInfo() const;
 private:
   typedef std::vector<Process>::iterator ProcessPtr; 
   typedef std::pair<unsigned int, ProcessPtr> ioQueueElem; 
@@ -27,7 +28,8 @@ private:
   void resetBurstTimer();
   Process::State decrementBurstTimer();
   void decrementCtxSwitchTimer(); 
-  void preemptRunningProc(); 
+  void preemptRunningProc();
+  
   inline bool burstTimerElapsed() const { return burstRemaining == 0; }
   static const std::function<bool(const ProcessPtr&, const ProcessPtr&)> processArrivalComparator; 
   static const std::function<bool(const ioQueueElem&, const ioQueueElem&)> processIoComparator;
@@ -45,6 +47,8 @@ private:
   unsigned int numPreempts = 0;
   unsigned int numCtxSwitches = 0;
   ProcessPtr runningProc;
+  ProcessPtr switchingOutProc;
+  ProcessPtr switchingInProc;
   const ProcessPtr nullProc;
 };
 

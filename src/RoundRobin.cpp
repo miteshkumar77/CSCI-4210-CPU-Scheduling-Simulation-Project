@@ -23,6 +23,8 @@ RoundRobin::RoundRobin(std::vector<Process>& processes,
   ctxSwitchRemaining(0),
   numProcs(processes.size()),
   runningProc(processes.end()),
+  switchingOutProc(processes.end()),
+  switchingInProc(processes.end()),
   nullProc(processes.end()) {
   orderedProcesses.reserve(processes.size()); 
   for (auto it = processes.begin(); it != processes.end(); ++it)
@@ -93,19 +95,39 @@ void RoundRobin::preemptRunningProc() {
 }
 
 bool RoundRobin::tick() {
+
   if (ctxSwitchRemaining) {
     decrementCtxSwitchTimer();
   } else {
+    
+    if (switchingOutProc != nullProc && switchingInProc != nullProc) {
+      throw std::runtime_error("Error: Process switching in, and switching out simultaneously.");
+    }
+
+    if (switchingInProc != nullProc) {
+      runningProc = switchingInProc;
+      switchingInProc = nullProc;
+    } else if (switchingOutProc != nullProc) {
+      if (switchingOutProc -> getState() == Process::State::WAITING) {
+        ioQueue.push({runningProc -> getCurrIoBurstTime() + timestamp, runningProc});
+      } else if (switchingOutProc -> getState() == Process::State::READY) {
+        pushLastReady(switchingOutProc); 
+      }
+      switchingOutProc = nullProc;
+    }
+
     if (runningProc == nullProc) {
       if (!isReadyQueueEmpty()) {
-        runningProc = peekFirstReady();
+        switchingInProc = peekFirstReady();
         popFirstReady();
         resetCtxSwitchDelay();
         if (!ctxSwitchRemaining) {
           return tick(); 
         }
         --ctxSwitchRemaining; 
-      } else if (latestProcessIdx == numProcs && ioQueue.empty()) {
+      } else if (latestProcessIdx == numProcs && ioQueue.empty() 
+              && switchingOutProc == nullProc && switchingInProc == nullProc) {
+        
         return false; // Simulation is over.
       }
     } else {
@@ -124,7 +146,8 @@ bool RoundRobin::tick() {
           if (!isReadyQueueEmpty()) {  
             preemptRunningProc();
             resetCtxSwitchDelay();
-            pushLastReady(runningProc);
+            switchingOutProc = runningProc;
+            // pushLastReady(runningProc);
             runningProc = nullProc;
           } else {
             resetBurstTimer();
@@ -132,10 +155,12 @@ bool RoundRobin::tick() {
         }
       } else if (currState == Process::State::WAITING) {
         resetCtxSwitchDelay();
-        ioQueue.push({runningProc -> getCurrIoBurstTime() + timestamp, runningProc});
+        switchingOutProc = runningProc;
+        // ioQueue.push({runningProc -> getCurrIoBurstTime() + timestamp, runningProc});
         runningProc = nullProc;
       } else if (currState == Process::State::TERMINATED) {
         resetCtxSwitchDelay();
+        switchingOutProc = runningProc;
         runningProc = nullProc;
       }
     }
@@ -161,9 +186,21 @@ bool RoundRobin::tick() {
     }
     ++latestProcessIdx;
   }
+
+  
   for (ProcessPtr p: orderedProcesses) {
     p -> makeEntry();
   }
+  std::cout << timestamp << "| Q: ";
+  for (auto& p : readyQueue) {
+    std::cout << p -> getPid() << ": " << p -> getCurrCpuBurstTime() << ", ";
+  }
+  if (switchingInProc != nullProc) {
+    std::cout << " Context Switching In: " << switchingInProc -> getPid() << ": " << switchingInProc -> getCurrCpuBurstTime();
+  } else if (runningProc != nullProc) {
+    std::cout << " Running: " << runningProc -> getPid() << ": " << runningProc -> getCurrCpuBurstTime(); 
+  }
+  std::cout << std::endl;
   ++timestamp;
   return true; // Simulation continues
 }
@@ -194,6 +231,13 @@ void RoundRobin::resetCtxSwitchDelay() {
   if (ctxSwitchRemaining) {
     throw std::runtime_error("Error: resetCtxSwitchDelay() called when ctxSwitchRemaining was not 0.");
   }
+  ++numCtxSwitches; 
   ctxSwitchRemaining = ctxSwitchDelay/2; 
 
+}
+
+void RoundRobin::printInfo() const {
+  std::cout << "Number of preempts: " << numPreempts << std::endl;
+  std::cout << "Number of context switches: " << numCtxSwitches << std::endl;
+  std::cout << "Total execution time: " << timestamp << "ms" << std::endl;
 }
