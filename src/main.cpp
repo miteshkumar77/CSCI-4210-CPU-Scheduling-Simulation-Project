@@ -7,9 +7,9 @@
 
 int main(int argc, char** argv) {
 
-  // std::vector<Process> processes = SeqGenerator::parseProcesses("test_input.txt"); 
-  std::vector<Process> processes = SeqGenerator::generateProccesses(26, 0.001, 3000, 42);
-  RoundRobin rr(processes, /* tslice: */ 3, /* tcs: */ 5); 
+  // std::vector<Process> processes = SeqGenerator::parseProcesses("test_input_2.txt"); 
+  std::vector<Process> processes = SeqGenerator::generateProccesses(10, 0.01, 400, 4211);
+  RoundRobin rr(processes, /* tslice: */ 4, /* tcs: */ 3); 
   std::cout << "Beginning Simulation..." << std::endl;
 
   while(rr.tick()); 

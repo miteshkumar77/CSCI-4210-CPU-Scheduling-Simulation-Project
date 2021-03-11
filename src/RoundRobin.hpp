@@ -21,7 +21,7 @@ class RoundRobin {
     typedef std::vector<Process>::iterator ProcessPtr;
     typedef std::pair<unsigned int, ProcessPtr> ioQueueElem;
 
-
+    void printEvent(const std::string& detail, bool term) const; 
     bool isReadyQueueEmpty() const { return readyQueue.empty(); }
     ProcessPtr peekLastReady() const;
     ProcessPtr peekFirstReady() const;

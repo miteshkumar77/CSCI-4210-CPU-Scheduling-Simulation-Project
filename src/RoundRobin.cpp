@@ -121,6 +121,7 @@ void RoundRobin::preemptRunningProc() {
   if (runningProc -> getState() != Process::State::RUNNING) {
     throw std::runtime_error("Error: preemptRunningProc() called for a non-RUNNING process.");
   }
+  printEvent("process " + std::string(1, runningProc -> getPid()) + " preempted.", false); 
   runningProc -> preempt();
   ++numPreempts;
 }
@@ -132,7 +133,18 @@ void RoundRobin::pushIo(ProcessPtr processPtr) {
   ioQueue.push({processPtr -> getCurrIoBurstTime() + timestamp, processPtr});
 }
 
+void RoundRobin::printEvent(const std::string& detail, bool term) const {
+  if (!term && timestamp > MAX_OUTPUT_TS) return;
+  if (detail == "") return;
+  std::cout << "time " << timestamp << "ms: " << detail << "[Q ";
+  for (auto it = readyQueue.begin(); !readyQueue.empty() && it != prev(readyQueue.end()); ++it) {
+    std::cout << (*it) -> getPid() << " ";
+  }
+  std::cout << (readyQueue.empty()?"<empty>":std::string(1, readyQueue.back() -> getPid())) << "]" << std::endl;
+}
+
 bool RoundRobin::tick() {
+  std::string detail; 
   if (tcsRemaining) {
     decrementTcs(); 
   } else {
@@ -149,7 +161,8 @@ bool RoundRobin::tick() {
       if (switchingInProc -> getState() != Process::State::SW_IN) {
         throw std::runtime_error("Error: Switching in process did not have correct SW_IN process state.");
       }
-      switchingInProc -> nextState(timestamp, tcs); 
+      printEvent(switchingInProc -> nextState(timestamp, tcs), false); 
+      
       resetBurstTimer();
       if (switchingInProc -> getState() != Process::State::RUNNING) {
         throw std::runtime_error("Error: SW_IN process did not switch to RUNNING state.");
@@ -157,23 +170,24 @@ bool RoundRobin::tick() {
       runningProc = switchingInProc;
       switchingInProc = nullProc;
     } else if (switchingOutProc != nullProc) {
+      
       if (switchingOutProc -> getState() == Process::State::SW_WAIT) {
-        switchingOutProc -> nextState(timestamp, tcs); 
+        printEvent(switchingOutProc -> nextState(timestamp, tcs), false); 
         pushIo(switchingOutProc);
         switchingOutProc = nullProc;
       } else if (switchingOutProc -> getState() == Process::State::SW_READY) {
-        switchingOutProc -> nextState(timestamp, tcs);
+        printEvent(switchingOutProc -> nextState(timestamp, tcs), false);
         pushLastReady(switchingOutProc);
         switchingOutProc = nullProc;
       } else if (switchingOutProc -> getState() == Process::State::SW_TERM) {
-        switchingOutProc -> nextState(timestamp, tcs);
+        printEvent(switchingOutProc -> nextState(timestamp, tcs), true);
         if (switchingOutProc -> getState() != Process::State::TERMINATED) {
           throw std::runtime_error("Error: SW_TERM process did not switch to TERMINATED state.");
         }
         switchingOutProc = nullProc;
       } else {
         throw std::runtime_error("Error: switching out process was not in SW_WAIT, SW_READY, or SW_TERM state.");
-      }
+      }      
     }
 
     if (runningProc == nullProc) {
@@ -183,7 +197,7 @@ bool RoundRobin::tick() {
           throw std::runtime_error("Error: process that was pulled from ready queue was not in READY state.");
         }
         popFirstReady();
-        switchingInProc -> nextState(timestamp, tcs);
+        printEvent(switchingInProc -> nextState(timestamp, tcs), false);
         if (switchingInProc -> getState() != Process::State::SW_IN) {
           throw std::runtime_error("Error: READY process did not switch to SW_IN state.");
         }
@@ -215,10 +229,12 @@ bool RoundRobin::tick() {
           }
         }
       } else if (currState == Process::State::SW_WAIT) {
+        printEvent("process " + std::string(1, runningProc -> getPid()) + " finished using the CPU.", false); 
         resetTcsRemaining();
         switchingOutProc = runningProc;
         runningProc = nullProc;
       } else if (currState == Process::State::SW_TERM) {
+        printEvent("process " + std::string(1, runningProc -> getPid()) + " terminated.", false);
         resetTcsRemaining();
         switchingOutProc = runningProc;
         runningProc = nullProc;
@@ -232,7 +248,7 @@ bool RoundRobin::tick() {
     if (ioQueue.top().second -> getState() != Process::State::WAITING) {
       throw std::runtime_error("Error: process in ioQueue was not in WAITING state.");
     }
-    ioQueue.top().second -> nextState(timestamp, tcs); 
+    detail = ioQueue.top().second -> nextState(timestamp, tcs); 
     if (ioQueue.top().second -> getState() != Process::State::READY) {
       throw std::runtime_error("Error: WAITING process did not switch to READY state.");
     }
@@ -241,6 +257,7 @@ bool RoundRobin::tick() {
     } else {
       pushFirstReady(ioQueue.top().second);
     }
+    printEvent(detail, false);
     ioQueue.pop();
   }
 
@@ -249,7 +266,7 @@ bool RoundRobin::tick() {
     if (orderedProcesses[latestProcessIdx] -> getState() != Process::State::UNARRIVED) {
       throw std::runtime_error("Error: unarrived process was not in UNARRIVED state.");
     }
-    orderedProcesses[latestProcessIdx] -> nextState(timestamp, tcs);
+    detail = orderedProcesses[latestProcessIdx] -> nextState(timestamp, tcs);
     if (orderedProcesses[latestProcessIdx] -> getState() != Process::State::READY) {
       throw std::runtime_error("Error: UNARRIVED process did not switch to READY state.");
     }
@@ -258,6 +275,7 @@ bool RoundRobin::tick() {
     } else {
       pushFirstReady(orderedProcesses[latestProcessIdx]);
     }
+    printEvent(detail, false);
     ++latestProcessIdx;
   }
   ++timestamp;

@@ -5,8 +5,8 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
-
-
+#include <string>
+#include "globals.hpp"
 
 class Process {
 
@@ -15,7 +15,7 @@ public:
   Process(unsigned int arrivalTime, 
     const std::vector<unsigned int>& cpuBurstTimes, 
     const std::vector<unsigned int>& ioBurstTimes); 
-  void nextState(unsigned int timestamp, unsigned int tcs); 
+  std::string nextState(unsigned int timestamp, unsigned int tcs); 
   Process::State getState() const { return processState; }
   Process::State decrementBurst();
   void printInfo() const;

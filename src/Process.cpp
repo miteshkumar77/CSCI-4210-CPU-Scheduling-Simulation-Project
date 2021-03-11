@@ -60,9 +60,13 @@ void Process::endTurnaroundTimer(unsigned int timestamp) {
   turnaroundTimer = -1;
 }
 // burstIndex
-void Process::nextState(unsigned int timestamp, unsigned int tcs) {
+std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
+  std::string detail = ""; 
   switch (processState) {
     case Process::State::UNARRIVED: // -> READY
+      if (timestamp < MAX_OUTPUT_TS) {
+        detail = "process " + std::string(1, getPid()) + " arrived."; 
+      }
       processState = Process::State::READY;
       startWaitingTimer(timestamp);
       startTurnaroundTimer(timestamp);
@@ -77,18 +81,29 @@ void Process::nextState(unsigned int timestamp, unsigned int tcs) {
       break;
     case Process::State::SW_IN: // -> RUNNING
       processState = Process::State::RUNNING; 
+      if (timestamp < MAX_OUTPUT_TS) {
+        detail = "process " + std::string(1, getPid()) + " began using CPU."; 
+      }
       break;
     case Process::State::SW_WAIT: // -> WAITING
+      if (timestamp < MAX_OUTPUT_TS) {
+        detail = "process " + std::string(1, getPid()) + " began performing I/O.";
+      }
       processState = Process::State::WAITING;
       endTurnaroundTimer(timestamp);
       break;
     case Process::State::WAITING: // -> READY
+      waitingTimes[burstIdx] -= 1;
       ++burstIdx;
       processState = Process::State::READY;
+      if (timestamp < MAX_OUTPUT_TS) {
+        detail = "process " + std::string(1, getPid()) + " finished performing I/O.";
+      }
       startWaitingTimer(timestamp); 
       startTurnaroundTimer(timestamp);
       break;
     case Process::State::SW_TERM: // -> TERMINATED
+      waitingTimes[burstIdx] -= 1;
       processState = Process::State::TERMINATED;
       endTurnaroundTimer(timestamp);
       ++burstIdx;
@@ -100,6 +115,7 @@ void Process::nextState(unsigned int timestamp, unsigned int tcs) {
     default:
       throw std::runtime_error("Error: nextState() called for unrecognized process state.");
   }
+  return detail;
 }
 
 Process::State Process::decrementBurst() {
