@@ -11,7 +11,7 @@ const std::function<bool(const RoundRobin::ioQueueElem&, const RoundRobin::ioQue
 RoundRobin::processIoComparator = 
 [] (const RoundRobin::ioQueueElem& a, const RoundRobin::ioQueueElem& b) -> bool {
   return a.first > b.first || 
-    (a.first == b.first && a.second -> getPid() < b.second -> getPid()); 
+    (a.first == b.first && a.second -> getPid() > b.second -> getPid()); 
 };
 
 RoundRobin::RoundRobin(std::vector<Process>& procs,
@@ -240,13 +240,16 @@ bool RoundRobin::tick() {
             
             runningProc = nullProc;
           } else {
+            ++timestamp;
+            printEvent("Time slice expired; no preemption because ready queue is empty", false); 
+            --timestamp;
             resetBurstTimer(); 
           }
         }
       } else if (currState == Process::State::SW_WAIT) {
         ++timestamp;
         printEvent("Process " + std::string(1, runningProc -> getPid()) + " completed a CPU burst; " +
-          std::to_string(runningProc -> getBurstsRemaining()) + " bursts to go", false);
+          std::to_string(runningProc -> getBurstsRemaining()) + " burst" + (runningProc -> getBurstsRemaining() == 1?" ":"s ") + "to go", false);
         --timestamp;
         resetTcsRemaining();
         switchingOutProc = runningProc;

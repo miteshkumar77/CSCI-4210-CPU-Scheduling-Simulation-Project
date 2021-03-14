@@ -14,11 +14,11 @@ Algorithm RR
 -- CPU utilization: 23.344%
 Algorithm RR
 -- average CPU burst time: 84.304 ms
--- average wait time: 232.345 ms
--- average turnaround time: 323.903 ms
--- total number of context switches: 874
--- total number of preemptions: 337
--- CPU utilization: 58.288%
+-- average wait time: 228.609 ms
+-- average turnaround time: 320.108 ms
+-- total number of context switches: 865
+-- total number of preemptions: 328
+-- CPU utilization: 58.355%
 Algorithm RR
 -- average CPU burst time: 903.431 ms
 -- average wait time: 525.562 ms

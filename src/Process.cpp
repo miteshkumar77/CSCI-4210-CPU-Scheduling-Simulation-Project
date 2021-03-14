@@ -126,8 +126,13 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       ++numCtxSwitches;
       processState = Process::State::RUNNING; 
       if (timestamp < MAX_OUTPUT_TS) {
-        detail = "Process " + std::string(1, getPid()) + " started using the CPU for " 
-          + std::to_string(cpuBurstTimes[burstIdx]) + "ms burst"; 
+        if (cpuBurstTimes[burstIdx] == originalCpuBurstTimes[burstIdx]) {  
+          detail = "Process " + std::string(1, getPid()) + " started using the CPU for " 
+            + std::to_string(cpuBurstTimes[burstIdx]) + "ms burst"; 
+        } else {
+          detail = "Process " + std::string(1, getPid()) + " started using the CPU with "
+            + std::to_string(cpuBurstTimes[burstIdx]) + "ms burst remaining";
+        }
       }
       break;
     case Process::State::SW_WAIT: // -> WAITING

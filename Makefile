@@ -1,29 +1,16 @@
-TARGETFULL ?= full.out
-TARGETLIM ?= limited.out
-SRC_DIRS ?= ./src
-CC = clang++
-CXX = clang++
-SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
-OBJS := $(addsuffix .o,$(basename $(SRCS)))
-DEPS := $(OBJS:.o=.d)
-
-INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
-
-
 limited: $(TARGETLIM)
-CPPFLAGS ?= $(INC_FLAGS) -Wall -Werror -g -D DISPLAY_MAX_T=1000
-$(TARGETLIM): $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) -o $@ $(LOADLIBES) $(LDLIBS)
+	clang++  -I./src -Wall -Werror -g -D DISPLAY_MAX_T=1000  -c -o src/main.o src/main.cpp
+	clang++  -I./src -Wall -Werror -g -D DISPLAY_MAX_T=1000  -c -o src/Process.o src/Process.cpp
+	clang++  -I./src -Wall -Werror -g -D DISPLAY_MAX_T=1000  -c -o src/RoundRobin.o src/RoundRobin.cpp
+	clang++  -I./src -Wall -Werror -g -D DISPLAY_MAX_T=1000  -c -o src/SeqGenerator.o src/SeqGenerator.cpp
+	clang++  ./src/main.o ./src/Process.o ./src/RoundRobin.o ./src/SeqGenerator.o -o limited.out
 
 full: $(TARGETFULL)
-CPPFLAGS ?= $(INC_FLAGS) -Wall -Werror -g
-$(TARGETFULL): $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) -o $@ $(LOADLIBES) $(LDLIBS) 
-	 
-
-.PHONY: clean limited full
+	clang++  -I./src -Wall -Werror -g -c -o src/main.o src/main.cpp
+	clang++  -I./src -Wall -Werror -g -c -o src/Process.o src/Process.cpp
+	clang++  -I./src -Wall -Werror -g -c -o src/RoundRobin.o src/RoundRobin.cpp
+	clang++  -I./src -Wall -Werror -g -c -o src/SeqGenerator.o src/SeqGenerator.cpp
+	clang++  ./src/main.o ./src/Process.o ./src/RoundRobin.o ./src/SeqGenerator.o -o full.out
+		
 clean:
-	$(RM) $(TARGET) $(OBJS) $(DEPS)
-
--include $(DEPS)
+	rm -f  ./src/main.o ./src/Process.o ./src/RoundRobin.o ./src/SeqGenerator.o ./src/main.d ./src/Process.d ./src/RoundRobin.d ./src/SeqGenerator.d
