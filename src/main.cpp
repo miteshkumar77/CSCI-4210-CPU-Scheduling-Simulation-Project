@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
   }
 
   std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
-  RoundRobin rr(processes, tslice, tcs, addToEnd); 
+  RoundRobin rr(processes, tslice, tcs, addToEnd, true); 
   while(rr.tick()); 
 
   std::ofstream ofs;

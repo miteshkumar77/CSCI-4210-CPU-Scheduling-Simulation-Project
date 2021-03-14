@@ -17,7 +17,7 @@
 
 class RoundRobin {
   public:
-    RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int tcs, bool addToEnd); 
+    RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int tcs, bool addToEnd, bool fcfs); 
     bool tick(); 
     void printInfo(std::ostream& os) const;
   private:
@@ -68,6 +68,7 @@ class RoundRobin {
     ProcessPtr switchingInProc;
     const ProcessPtr nullProc;
     const bool addToEnd;
+    const bool fcfs;
 
     // Non-Default
     std::vector<ProcessPtr> orderedProcesses;

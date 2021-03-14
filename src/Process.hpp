@@ -37,6 +37,7 @@ public:
   unsigned long long getNumCtxSwitches() const { return numCtxSwitches; }
   unsigned int getBurstsRemaining() const { return originalCpuBurstTimes.size() - burstIdx - 1; }
   unsigned int getRemainingBurstTime() const;
+  void reset();
 private:
   void startWaitingTimer(unsigned int timestamp);
   void endWaitingTimer(unsigned int timestamp);

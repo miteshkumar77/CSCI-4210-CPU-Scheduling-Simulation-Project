@@ -17,14 +17,16 @@ RoundRobin::processIoComparator =
 RoundRobin::RoundRobin(std::vector<Process>& procs,
   unsigned int tslice,
   unsigned int tcs,
-  bool addToEnd):
+  bool addToEnd,
+  bool fcfs):
   ioQueue(processIoComparator),
   tslice(tslice), tcs(tcs), numProcs(procs.size()),
   runningProc(procs.end()),
   switchingOutProc(procs.end()),
   switchingInProc(procs.end()),
   nullProc(procs.end()),
-  addToEnd(addToEnd) {
+  addToEnd(addToEnd),
+  fcfs(fcfs) {
     orderedProcesses.reserve(procs.size()); 
     for (auto it = procs.begin(); it != procs.end(); ++it)
       orderedProcesses.push_back(it); 
@@ -122,6 +124,9 @@ void RoundRobin::preemptRunningProc() {
   if (runningProc -> getState() != Process::State::RUNNING) {
     throw std::runtime_error("Error: preemptRunningProc() called for a non-RUNNING process.");
   }
+  if (fcfs) {
+    throw std::runtime_error("Error: preemptRunningProc() calle for FCFS.");
+  }
   ++timestamp;
   printEvent("Time slice expired; process " + std::string(1, runningProc -> getPid()) + " preempted with " + std::to_string(runningProc -> getRemainingBurstTime()) + "ms to go", false);
   --timestamp;
@@ -155,8 +160,8 @@ bool RoundRobin::tick() {
         }
       }
     }
-    printEvent("Simulator started for RR with time slice " + std::to_string(tslice) + 
-    "ms and rr_add to " + ((addToEnd)?"END":"BEGINNING"), false);  
+    printEvent("Simulator started for " + std::string((fcfs?"FCFS":"RR")) + " with time slice " + std::to_string(tslice) + 
+    "ms and rr_add to " + (addToEnd?"END":"BEGINNING"), false);  
   }
   std::string detail; 
   if (tcsRemaining) {
@@ -235,7 +240,7 @@ bool RoundRobin::tick() {
       Process::State currState = decrementBurstTimer(); 
       if (currState == Process::State::RUNNING) {
         if (burstTimerElapsed()) {
-          if (!isReadyQueueEmpty()) {
+          if (!isReadyQueueEmpty() && !fcfs) {
             preemptRunningProc(); 
             resetTcsRemaining();
             switchingOutProc = runningProc;
@@ -286,24 +291,7 @@ bool RoundRobin::tick() {
     } else {
       pushFirstReady(ioQueue.top().second);
     }
-    
     printEvent(detail, false);
-    if (runningProc == nullProc && switchingInProc == nullProc && switchingOutProc == nullProc) {
-      switchingInProc = peekFirstReady();
-      if(switchingInProc -> getState() != Process::State::READY) {
-        throw std::runtime_error("Error: process that was pulled from ready queue was not in READY state.");
-      }
-      popFirstReady();
-      printEvent(switchingInProc -> nextState(timestamp, tcs), false);
-      if (switchingInProc -> getState() != Process::State::SW_IN) {
-        throw std::runtime_error("Error: READY process did not switch to SW_IN state.");
-      }
-      resetTcsRemaining();
-      if (!tcsRemaining) {
-        return tick(); 
-      }
-      decrementTcs();  
-    }
     ioQueue.pop();
   }
 
@@ -323,22 +311,23 @@ bool RoundRobin::tick() {
     }
     printEvent(detail, false);
     ++latestProcessIdx;
-    if (runningProc == nullProc && switchingInProc == nullProc && switchingOutProc == nullProc) {
-      switchingInProc = peekFirstReady();
-      if(switchingInProc -> getState() != Process::State::READY) {
-        throw std::runtime_error("Error: process that was pulled from ready queue was not in READY state.");
-      }
-      popFirstReady();
-      printEvent(switchingInProc -> nextState(timestamp, tcs), false);
-      if (switchingInProc -> getState() != Process::State::SW_IN) {
-        throw std::runtime_error("Error: READY process did not switch to SW_IN state.");
-      }
-      resetTcsRemaining();
-      if (!tcsRemaining) {
-        return tick(); 
-      }
-      decrementTcs();  
+  }
+
+  if (runningProc == nullProc && switchingInProc == nullProc && switchingOutProc == nullProc && !isReadyQueueEmpty()) {
+    switchingInProc = peekFirstReady();
+    if(switchingInProc -> getState() != Process::State::READY) {
+      throw std::runtime_error("Error: process that was pulled from ready queue was not in READY state.");
     }
+    popFirstReady();
+    printEvent(switchingInProc -> nextState(timestamp, tcs), false);
+    if (switchingInProc -> getState() != Process::State::SW_IN) {
+      throw std::runtime_error("Error: READY process did not switch to SW_IN state.");
+    }
+    resetTcsRemaining();
+    if (!tcsRemaining) {
+      return tick(); 
+    }
+    decrementTcs();  
   }
   ++timestamp;
   return true;
@@ -388,7 +377,7 @@ unsigned long long RoundRobin::calcTotalNumPreemptions() const {
 }
 
 void RoundRobin::printInfo(std::ostream& os) const {
-  os << "Algorithm RR" << std::endl;
+  os << "Algorithm " + std::string(fcfs?"FCFS":"RR") << std::endl;
 
   os.precision(3);
   os << "-- average CPU burst time: " << std::fixed << calcAvgCpuBurstTime() << " ms" << std::endl;

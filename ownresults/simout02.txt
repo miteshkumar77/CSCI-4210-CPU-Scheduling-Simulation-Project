@@ -1,4 +1,4 @@
-Algorithm RR
+Algorithm FCFS
 -- average CPU burst time: 80.312 ms
 -- average wait time: 0.000 ms
 -- average turnaround time: 84.312 ms
