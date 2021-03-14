@@ -20,7 +20,7 @@ namespace SeqGenerator {
   unsigned int floorNextExp(double lambda, double maxval);
   unsigned int ceilNextExp(double lambda, double maxval);
   std::vector<Process> generateProccesses(unsigned short n, double lambda, 
-    double maxval, long int seedval);
+    double maxval, long int seedval, double alpha);
   std::vector<Process> parseProcesses(std::string fname); 
 }
 

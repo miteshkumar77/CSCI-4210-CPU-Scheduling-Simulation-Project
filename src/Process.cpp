@@ -4,7 +4,9 @@ char Process::gpid = 'A' - 1;
 
 Process::Process(unsigned int arrivalTime, 
   const std::vector<unsigned int>& cpuBurstTimes, 
-  const std::vector<unsigned int>& ioBurstTimes): 
+  const std::vector<unsigned int>& ioBurstTimes,
+  double tau,
+  double alpha): 
   arrivalTime(arrivalTime), 
   pid(++gpid), 
   originalCpuBurstTimes(std::vector<unsigned int>(cpuBurstTimes.begin(), cpuBurstTimes.end())),
@@ -12,6 +14,7 @@ Process::Process(unsigned int arrivalTime,
   cpuBurstTimes(std::move(cpuBurstTimes)),
   waitingTimes(std::vector<unsigned int>(cpuBurstTimes.size(), 0)),
   turnaroundTimes(std::vector<unsigned int>(cpuBurstTimes.size(), 0)),
+  tau(tau), alpha(alpha),
   processState(State::UNARRIVED) {
   
   if (gpid > 'Z') {
@@ -20,11 +23,50 @@ Process::Process(unsigned int arrivalTime,
   }
 }
 
+std::pair<unsigned long long, unsigned long long> Process::getTotalCpuBurstTime() const {
+  return {
+    std::accumulate(originalCpuBurstTimes.begin(), originalCpuBurstTimes.end(), 0),
+    originalCpuBurstTimes.size()
+  };
+}
+std::pair<unsigned long long, unsigned long long> Process::getTotalWaitTime() const {
+  return {
+    std::accumulate(waitingTimes.begin(), waitingTimes.end(), 0, [](unsigned int acc, unsigned int prev) -> unsigned long long {
+      return (prev == -1)?acc:acc+prev; 
+    }),
+    waitingTimes.size()
+  };
+}
+
+std::pair<unsigned long long, unsigned long long> Process::getTotalTurnaroundTime() const {
+  return {
+    std::accumulate(turnaroundTimes.begin(), turnaroundTimes.end(), 0),
+    turnaroundTimes.size()
+  };
+}
+
 unsigned int Process::getCurrIoBurstTime() const {
-  if (burstIdx == cpuBurstTimes.size()) {
+  if (burstIdx >= cpuBurstTimes.size() - 1) {
     throw std::runtime_error("Error: tried to get burst io time of last cpu burst.");
   }
   return originalIoBurstTimes[burstIdx];
+}
+
+unsigned int Process::getCurrOriginalCpuBurstTime() const {
+  if (burstIdx >= cpuBurstTimes.size()) {
+    throw std::runtime_error("Error: tried to get burst io time of last cpu burst.");
+  }
+  return originalCpuBurstTimes[burstIdx];
+}
+
+void Process::recalculateTau() {
+  if ((processState != Process::State::SW_WAIT) && (processState != Process::State::SW_TERM)) {
+    throw std::runtime_error("Error: called recalculateTau() for process that isn't in SW_WAIT or SW_TERM");
+  }
+  if (burstIdx >= originalCpuBurstTimes[burstIdx]) {
+    throw std::runtime_error("Error: called recalculateTau() with out of bounds burstIdx.");
+  }
+  tau = originalCpuBurstTimes[burstIdx] * alpha + (1 - alpha) * tau;  
 }
 
 void Process::startWaitingTimer(unsigned int timestamp) {
@@ -47,7 +89,7 @@ void Process::startTurnaroundTimer(unsigned int timestamp) {
   if (turnaroundTimer != -1) {
     throw std::runtime_error("Error: startTurnaroundTimer() called while timer is already running.");
   }
-  turnaroundTimer = timestamp + 1;
+  turnaroundTimer = timestamp;
 }
 void Process::endTurnaroundTimer(unsigned int timestamp) {
   if (turnaroundTimer == -1) {
@@ -59,13 +101,14 @@ void Process::endTurnaroundTimer(unsigned int timestamp) {
   turnaroundTimes[burstIdx] += timestamp - turnaroundTimer; 
   turnaroundTimer = -1;
 }
-// burstIndex
+
 std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
+  
   std::string detail = ""; 
   switch (processState) {
     case Process::State::UNARRIVED: // -> READY
       if (timestamp < MAX_OUTPUT_TS) {
-        detail = "process " + std::string(1, getPid()) + " arrived."; 
+        detail = "Process " + std::string(1, getPid()) + " arrived; placed on ready queue"; 
       }
       processState = Process::State::READY;
       startWaitingTimer(timestamp);
@@ -80,15 +123,14 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       startWaitingTimer(timestamp);
       break;
     case Process::State::SW_IN: // -> RUNNING
+      ++numCtxSwitches;
       processState = Process::State::RUNNING; 
       if (timestamp < MAX_OUTPUT_TS) {
-        detail = "process " + std::string(1, getPid()) + " began using CPU."; 
+        detail = "Process " + std::string(1, getPid()) + " started using the CPU for " 
+          + std::to_string(cpuBurstTimes[burstIdx]) + "ms burst"; 
       }
       break;
     case Process::State::SW_WAIT: // -> WAITING
-      if (timestamp < MAX_OUTPUT_TS) {
-        detail = "process " + std::string(1, getPid()) + " began performing I/O.";
-      }
       processState = Process::State::WAITING;
       endTurnaroundTimer(timestamp);
       break;
@@ -96,8 +138,9 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       waitingTimes[burstIdx] -= 1;
       ++burstIdx;
       processState = Process::State::READY;
+      
       if (timestamp < MAX_OUTPUT_TS) {
-        detail = "process " + std::string(1, getPid()) + " finished performing I/O.";
+        detail = "Process " + std::string(1, getPid()) + " completed I/O; placed on ready queue";
       }
       startWaitingTimer(timestamp); 
       startTurnaroundTimer(timestamp);
@@ -136,10 +179,18 @@ Process::State Process::decrementBurst() {
   return processState;
 }
 
+unsigned int Process::getRemainingBurstTime() const {
+  if (burstIdx == cpuBurstTimes.size()) {
+    throw std::runtime_error("Error: getRemainingBurstTime() called for an out of bounds burstIdx.");
+  }
+  return cpuBurstTimes[burstIdx];
+}
+
 void Process::preempt() {
   if (processState != Process::State::RUNNING) {
     throw std::runtime_error("Error: preempt() called for a non-RUNNING process.");
   }
+  ++numPreempts;
   processState = Process::State::SW_READY;
 }
 

@@ -1,4 +1,5 @@
-TARGET ?= a.out
+TARGETFULL ?= full.out
+TARGETLIM ?= limited.out
 SRC_DIRS ?= ./src
 CC = clang++
 CXX = clang++
@@ -9,12 +10,19 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CPPFLAGS ?= $(INC_FLAGS) -Wall -Werror -g
 
-$(TARGET): $(OBJS)
+limited: $(TARGETLIM)
+CPPFLAGS ?= $(INC_FLAGS) -Wall -Werror -g -D DISPLAY_MAX_T=1000
+$(TARGETLIM): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@ $(LOADLIBES) $(LDLIBS)
 
-.PHONY: clean
+full: $(TARGETFULL)
+CPPFLAGS ?= $(INC_FLAGS) -Wall -Werror -g
+$(TARGETFULL): $(OBJS)
+	$(CC) $(LDFLAGS) $(OBJS) -o $@ $(LOADLIBES) $(LDLIBS) 
+	 
+
+.PHONY: clean limited full
 clean:
 	$(RM) $(TARGET) $(OBJS) $(DEPS)
 

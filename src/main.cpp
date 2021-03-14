@@ -1,20 +1,52 @@
 #include <stdlib.h>
 #include <iostream>
 #include <limits>
+#include <string>
+#include <fstream>
 #include "SeqGenerator.hpp"
 #include "Process.hpp"
 #include "RoundRobin.hpp"
 
+/* [n: number of processes] [seed] [lambda] [limit] [tcs] [alpha] [tslice] [rr_add: BEGINNING or END] */
 int main(int argc, char** argv) {
+  
+  if (argc != 8 && argc != 9) {
+    std::cerr << "ERROR: incorrect argc." << std::endl;
+    return EXIT_FAILURE;
+  }
 
-  // std::vector<Process> processes = SeqGenerator::parseProcesses("test_input_2.txt"); 
-  std::vector<Process> processes = SeqGenerator::generateProccesses(10, 0.01, 400, 4211);
-  RoundRobin rr(processes, /* tslice: */ 4, /* tcs: */ 3); 
-  std::cout << "Beginning Simulation..." << std::endl;
+  bool add_to_end = true;
+  int n = atoi(*(argv + 1)); 
+  long seedval = atol(*(argv + 2));
+  double lambda = std::stod(*(argv + 3));
+  int maxval = atoi(*(argv + 4)); 
+  int tcs = atoi(*(argv + 5)); 
+  double alpha = std::stod(*(argv + 6));
+  int tslice = atoi(*(argv + 7)); 
+  if (tslice % 2 != 0) {
+    std::cerr << "ERROR: tslice isn't an even number." << std::endl;
+    return EXIT_FAILURE;
+  }
 
+  if (argc == 9) {
+    if ((*(argv + 8)) == std::string("BEGINNING")) {
+      add_to_end = false;
+    } else if ((*(argv + 8)) == std::string("END")) {
+      /* add_to_end = true; */
+    } else {
+      std::cerr << "ERROR: rr_add (arg 8) must be either BEGINNING or END if included." << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
+  std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
+  RoundRobin rr(processes, tslice, tcs); 
   while(rr.tick()); 
-  rr.printInfo(); 
 
-  // for (auto& process : processes) process.printInfo(); 
+  std::ofstream ofs;
+  ofs.open("simout.txt", std::ofstream::out | std::ofstream::trunc);
+  rr.printInfo(ofs); 
+  ofs.close(); 
   return EXIT_SUCCESS; 
 }
+

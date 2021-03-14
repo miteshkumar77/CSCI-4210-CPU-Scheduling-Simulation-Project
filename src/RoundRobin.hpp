@@ -10,13 +10,16 @@
 #include <stdexcept>
 #include "Process.hpp"
 #include <utility>
+#include <string>
+#include <sstream>
+#include <iostream>
 
 
 class RoundRobin {
   public:
     RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int tcs); 
     bool tick(); 
-    void printInfo() const;
+    void printInfo(std::ostream& os) const;
   private:
     typedef std::vector<Process>::iterator ProcessPtr;
     typedef std::pair<unsigned int, ProcessPtr> ioQueueElem;
@@ -31,6 +34,12 @@ class RoundRobin {
     Process::State decrementBurstTimer(); 
     void pushIo(ProcessPtr processPtr); 
 
+    double calcAvgWaitTime() const;
+    double calcAvgTurnaroundTime() const;
+    double calcAvgCpuBurstTime() const;
+    unsigned long long calcTotalNumCtxSwitches() const;
+    unsigned long long calcTotalNumPreemptions() const;
+    double calcCpuUtilization() const { return 100.0 * (double)cpuUsageTime/timestamp; }
     void resetTcsRemaining(); 
     void resetBurstTimer();
     
@@ -47,8 +56,7 @@ class RoundRobin {
     unsigned int burstRemaining = 0;
     unsigned int tcsRemaining = 0;
     const bool addToEnd = true;
-    unsigned int numPreempts = 0;
-    unsigned int numCtxSwitches = 0;
+    unsigned int cpuUsageTime = 0;
 
     // Default
     std::priority_queue<ioQueueElem, std::vector<ioQueueElem>, decltype(processIoComparator)> ioQueue;
