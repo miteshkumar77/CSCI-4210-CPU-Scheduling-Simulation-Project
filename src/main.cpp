@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  bool add_to_end = true;
+  bool addToEnd = true;
   int n = atoi(*(argv + 1)); 
   long seedval = atol(*(argv + 2));
   double lambda = std::stod(*(argv + 3));
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 
   if (argc == 9) {
     if ((*(argv + 8)) == std::string("BEGINNING")) {
-      add_to_end = false;
+      addToEnd = false;
     } else if ((*(argv + 8)) == std::string("END")) {
       /* add_to_end = true; */
     } else {
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
   }
 
   std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
-  RoundRobin rr(processes, tslice, tcs); 
+  RoundRobin rr(processes, tslice, tcs, addToEnd); 
   while(rr.tick()); 
 
   std::ofstream ofs;

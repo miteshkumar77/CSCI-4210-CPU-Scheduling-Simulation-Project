@@ -17,7 +17,7 @@
 
 class RoundRobin {
   public:
-    RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int tcs); 
+    RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int tcs, bool addToEnd); 
     bool tick(); 
     void printInfo(std::ostream& os) const;
   private:
@@ -55,7 +55,7 @@ class RoundRobin {
     int timestamp = 0;
     unsigned int burstRemaining = 0;
     unsigned int tcsRemaining = 0;
-    const bool addToEnd = true;
+    
     unsigned int cpuUsageTime = 0;
 
     // Default
@@ -67,6 +67,7 @@ class RoundRobin {
     ProcessPtr switchingOutProc;
     ProcessPtr switchingInProc;
     const ProcessPtr nullProc;
+    const bool addToEnd;
 
     // Non-Default
     std::vector<ProcessPtr> orderedProcesses;

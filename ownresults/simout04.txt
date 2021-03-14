@@ -1,6 +1,6 @@
 Algorithm RR
 -- average CPU burst time: 84.304 ms
--- average wait time: 228.609 ms
+-- average wait time: 229.361 ms
 -- average turnaround time: 320.108 ms
 -- total number of context switches: 865
 -- total number of preemptions: 328

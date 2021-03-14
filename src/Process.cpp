@@ -116,7 +116,11 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       break;
     case Process::State::READY: // -> SW_IN
       processState = Process::State::SW_IN;
-      endWaitingTimer(timestamp);
+      if (cpuBurstTimes[burstIdx] == originalCpuBurstTimes[burstIdx]) {
+        endWaitingTimer(timestamp + 1);
+      } else {
+        endWaitingTimer(timestamp);
+      }
       break;
     case Process::State::SW_READY: // -> READY
       processState = Process::State::READY;

@@ -16,13 +16,15 @@ RoundRobin::processIoComparator =
 
 RoundRobin::RoundRobin(std::vector<Process>& procs,
   unsigned int tslice,
-  unsigned int tcs):
+  unsigned int tcs,
+  bool addToEnd):
   ioQueue(processIoComparator),
   tslice(tslice), tcs(tcs), numProcs(procs.size()),
   runningProc(procs.end()),
   switchingOutProc(procs.end()),
   switchingInProc(procs.end()),
-  nullProc(procs.end()) {
+  nullProc(procs.end()),
+  addToEnd(addToEnd) {
     orderedProcesses.reserve(procs.size()); 
     for (auto it = procs.begin(); it != procs.end(); ++it)
       orderedProcesses.push_back(it); 
