@@ -1,0 +1,69 @@
+Only in profresults: output02-full.txt
+Only in profresults: output03-full.txt
+Only in profresults: output04-full.txt
+diff -x 'profresults/*-full.txt' ownresults/output04.txt profresults/output04.txt
+53c53
+< time 402ms: Process A completed I/O; placed on ready queue [Q G I J F N E D P L H B O A]
+---
+> time 402ms: Process A completed I/O; placed on ready queue [Q C G I J F N E D P L H B O A]
+79,91c79,91
+< time 13910ms: Process K terminated [Q F M B]
+< time 16212ms: Process A terminated [Q O M B]
+< time 25075ms: Process B terminated [Q M H]
+< time 25224ms: Process P terminated [Q M I H]
+< time 33931ms: Process F terminated [Q N G]
+< time 36953ms: Process N terminated [Q <empty>]
+< time 37525ms: Process O terminated [Q G E]
+< time 51843ms: Process E terminated [Q H]
+< time 53313ms: Process M terminated [Q <empty>]
+< time 73290ms: Process H terminated [Q <empty>]
+< time 76267ms: Process I terminated [Q <empty>]
+< time 77666ms: Process G terminated [Q <empty>]
+< time 77668ms: Simulator ended for RR [Q <empty>]
+---
+> time 13910ms: Process K terminated [Q M F B]
+> time 16279ms: Process A terminated [Q O B M]
+> time 25067ms: Process B terminated [Q M G H]
+> time 25242ms: Process P terminated [Q M]
+> time 33577ms: Process F terminated [Q H M]
+> time 36707ms: Process O terminated [Q H E]
+> time 37187ms: Process N terminated [Q G]
+> time 51168ms: Process E terminated [Q <empty>]
+> time 53339ms: Process M terminated [Q <empty>]
+> time 72726ms: Process H terminated [Q I]
+> time 76392ms: Process I terminated [Q <empty>]
+> time 77577ms: Process G terminated [Q <empty>]
+> time 77579ms: Simulator ended for RR [Q <empty>]
+Only in profresults: output05-full.txt
+diff -x 'profresults/*-full.txt' ownresults/simout02.txt profresults/simout02.txt
+4c4
+< -- average turnaround time: 83.312 ms
+---
+> -- average turnaround time: 84.312 ms
+diff -x 'profresults/*-full.txt' ownresults/simout03.txt profresults/simout03.txt
+3,4c3,4
+< -- average wait time: 12.027 ms
+< -- average turnaround time: 118.568 ms
+---
+> -- average wait time: 12.216 ms
+> -- average turnaround time: 119.568 ms
+diff -x 'profresults/*-full.txt' ownresults/simout04.txt profresults/simout04.txt
+3,7c3,7
+< -- average wait time: 232.345 ms
+< -- average turnaround time: 322.903 ms
+< -- total number of context switches: 874
+< -- total number of preemptions: 337
+< -- CPU utilization: 58.288%
+---
+> -- average wait time: 229.361 ms
+> -- average turnaround time: 320.108 ms
+> -- total number of context switches: 865
+> -- total number of preemptions: 328
+> -- CPU utilization: 58.355%
+diff -x 'profresults/*-full.txt' ownresults/simout05.txt profresults/simout05.txt
+3,4c3,4
+< -- average wait time: 525.562 ms
+< -- average turnaround time: 1432.812 ms
+---
+> -- average wait time: 526.025 ms
+> -- average turnaround time: 1433.812 ms
