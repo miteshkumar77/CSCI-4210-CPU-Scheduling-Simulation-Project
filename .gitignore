@@ -33,3 +33,6 @@
 
 # Editors
 .vscode
+
+# Output files
+ownresults
