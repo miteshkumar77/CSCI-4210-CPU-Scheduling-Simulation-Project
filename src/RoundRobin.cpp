@@ -225,7 +225,7 @@ void RoundRobin::run() {
       if (runningProc -> getState() != Process::State::RUNNING) {
         throw std::runtime_error("Error: SW_IN process did not switch to RUNNING state");
       }
-
+      ++cpuUsageTime;
       Process::State currState = decrementBurstTimer();
       if (currState == Process::State::RUNNING) {
         if (burstTimerElapsed()) {

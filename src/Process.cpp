@@ -117,7 +117,7 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
     case Process::State::READY: // -> SW_IN
       processState = Process::State::SW_IN;
       if (cpuBurstTimes[burstIdx] == originalCpuBurstTimes[burstIdx]) {
-        endWaitingTimer(timestamp + 1);
+        endWaitingTimer(timestamp);
       } else {
         endWaitingTimer(timestamp);
       }
@@ -144,7 +144,7 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       endTurnaroundTimer(timestamp);
       break;
     case Process::State::WAITING: // -> READY
-      waitingTimes[burstIdx] -= 1;
+      waitingTimes[burstIdx];
       ++burstIdx;
       processState = Process::State::READY;
       
@@ -155,7 +155,7 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       startTurnaroundTimer(timestamp);
       break;
     case Process::State::SW_TERM: // -> TERMINATED
-      waitingTimes[burstIdx] -= 1;
+      waitingTimes[burstIdx];
       processState = Process::State::TERMINATED;
       endTurnaroundTimer(timestamp);
       ++burstIdx;
