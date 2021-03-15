@@ -40,8 +40,9 @@ int main(int argc, char** argv) {
   }
 
   std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
-  RoundRobin rr(processes, tslice, tcs, addToEnd, true); 
-  while(rr.tick()); 
+  RoundRobin rr(processes, tslice, tcs, addToEnd, /* FCFS: true / RR: false */false); 
+  // while(rr.tick());
+  rr.run();  
 
   std::ofstream ofs;
   ofs.open("simout.txt", std::ofstream::out | std::ofstream::trunc);

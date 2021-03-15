@@ -127,9 +127,7 @@ void RoundRobin::preemptRunningProc() {
   if (fcfs) {
     throw std::runtime_error("Error: preemptRunningProc() calle for FCFS.");
   }
-  ++timestamp;
   printEvent("Time slice expired; process " + std::string(1, runningProc -> getPid()) + " preempted with " + std::to_string(runningProc -> getRemainingBurstTime()) + "ms to go", false);
-  --timestamp;
   runningProc -> preempt();
 }
 
@@ -150,6 +148,191 @@ void RoundRobin::printEvent(const std::string& detail, bool term) const {
   std::cout << (readyQueue.empty()?"<empty>":std::string(1, readyQueue.back() -> getPid())) << "]" << std::endl;
 }
 
+
+/*
+
+
+A if context switch in completed, start running the process
+B decrement burst timer on running process, preempt or finish burst and start a context switch out
+C if no running process or context switching process, pull next process from ready queue and begin context switch in
+D io queue to ready queue
+E new process arrival add to ready queue
+
+
+*/
+
+
+void RoundRobin::run() {
+  for (char it = 'A'; it <= 'A' + orderedProcesses.size() - 1; ++it) {
+    for (auto& proc : orderedProcesses) {
+      if (proc -> getPid() == it) {
+        std::cout << "Process " << it << " [NEW] (arrival time " << proc -> getArrivalTime() << " ms) ";
+        std::cout << proc -> getNumBursts() << " CPU burst" << (proc -> getNumBursts() == 1?"":"s") << std::endl;
+      }
+    }
+  }
+  printEvent("Simulator started for " + std::string((fcfs?"FCFS":"RR with time slice " + std::to_string(tslice) + 
+    "ms and rr_add to " + (addToEnd?"END":"BEGINNING"))) , false);
+  std::string detail;
+  while(true) { // <<< BEGIN RR/FCFS
+    if (switchingInProc == nullProc && 
+        switchingOutProc == nullProc && 
+        runningProc == nullProc && 
+        isReadyQueueEmpty() && 
+        latestProcessIdx >= orderedProcesses.size() &&
+        ioQueue.empty()) {
+
+      break;
+    }
+    
+
+    if (tcsRemaining) {
+      decrementTcs(); 
+    }
+
+    if ((switchingOutProc != nullProc || switchingInProc != nullProc) &&
+          runningProc != nullProc) {
+        
+      throw std::runtime_error("Error: Process running while there is a process in context switch.");
+    }
+    if (switchingOutProc != nullProc && switchingInProc != nullProc) {
+      throw std::runtime_error("Error: Processes switching in, and switching out simultaneously.");
+    }
+
+    if (!tcsRemaining && switchingOutProc != nullProc) {
+      if (switchingOutProc -> getState() == Process::State::SW_WAIT) {
+        printEvent(switchingOutProc -> nextState(timestamp, tcs), false); 
+        
+        pushIo(switchingOutProc);
+        switchingOutProc = nullProc;
+      } else if (switchingOutProc -> getState() == Process::State::SW_READY) {
+        printEvent(switchingOutProc -> nextState(timestamp, tcs), false);
+        pushLastReady(switchingOutProc);
+        switchingOutProc = nullProc;
+      } else if (switchingOutProc -> getState() == Process::State::SW_TERM) {
+        printEvent(switchingOutProc -> nextState(timestamp, tcs), true);
+        if (switchingOutProc -> getState() != Process::State::TERMINATED) {
+          throw std::runtime_error("Error: SW_TERM process did not switch to TERMINATED state.");
+        }
+        switchingOutProc = nullProc;
+      } else {
+        throw std::runtime_error("Error: switching out process was not in SW_WAIT, SW_READY, or SW_TERM state.");
+      }
+    }
+
+    // (a) CPU burst completion
+    if (runningProc != nullProc) {
+      if (runningProc -> getState() != Process::State::RUNNING) {
+        throw std::runtime_error("Error: SW_IN process did not switch to RUNNING state");
+      }
+
+      Process::State currState = decrementBurstTimer();
+      if (currState == Process::State::RUNNING) {
+        if (burstTimerElapsed()) {
+          if (!isReadyQueueEmpty() && !fcfs) {
+            preemptRunningProc();
+            resetTcsRemaining();
+            switchingOutProc = runningProc;
+
+            runningProc = nullProc;
+          } else {
+            if (!fcfs) {
+              printEvent("Time slice expired; no preemption because ready queue is empty", false);
+            }
+            resetBurstTimer();
+          }
+        }
+      } else if (currState == Process::State::SW_WAIT) {
+        printEvent("Process " + std::string(1, runningProc -> getPid()) + " completed a CPU burst; " +
+          std::to_string(runningProc -> getBurstsRemaining()) + " burst" + (runningProc -> getBurstsRemaining() == 1?" ":"s ") + "to go", false);
+        resetTcsRemaining(); 
+        switchingOutProc = runningProc;
+        runningProc = nullProc;
+        printEvent("Process " + std::string(1, switchingOutProc -> getPid()) + 
+          " switching out of CPU; will block on I/O until time " + std::to_string(switchingOutProc -> getCurrIoBurstTime() + timestamp + tcsRemaining) + "ms", false);
+      } else if (currState == Process::State::SW_TERM) {
+        printEvent("Process " + std::string(1, runningProc -> getPid()) + " terminated", true);
+        resetTcsRemaining(); 
+        switchingOutProc = runningProc;
+        runningProc = nullProc;
+      } else {
+        throw std::runtime_error("Error: runningProc wasn't in RUNNING, SW_WAIT, or SW_TERM stage after decrementBurst");
+      }
+    }
+
+
+    if (!tcsRemaining && switchingInProc != nullProc) {
+      if (switchingInProc -> getState() != Process::State::SW_IN) {
+        throw std::runtime_error("Error: Switching in process did not have correct SW_IN process state.");
+      }
+      printEvent(switchingInProc -> nextState(timestamp, tcs), false); 
+      
+      resetBurstTimer();
+      if (switchingInProc -> getState() != Process::State::RUNNING) {
+        throw std::runtime_error("Error: SW_IN process did not switch to RUNNING state.");
+      }
+      runningProc = switchingInProc;
+      switchingInProc = nullProc;
+    }
+
+    // (b) I/O burst completions
+    while(!ioQueue.empty() && ioQueue.top().first <= timestamp) {
+      if (ioQueue.top().second -> getState() != Process::State::WAITING) {
+        throw std::runtime_error("Error: process in ioQueue was not in WAITING state.");
+      }
+      detail = ioQueue.top().second -> nextState(timestamp, tcs); 
+      if (ioQueue.top().second -> getState() != Process::State::READY) {
+        throw std::runtime_error("Error: WAITING process did not switch to READY state.");
+      }
+      if (addToEnd) {
+        pushLastReady(ioQueue.top().second);
+      } else {
+        pushFirstReady(ioQueue.top().second);
+      }
+      printEvent(detail, false);
+      ioQueue.pop(); 
+    }
+    
+    // (c) new process arrivals
+    while(latestProcessIdx < numProcs &&
+      orderedProcesses[latestProcessIdx] -> getArrivalTime() <= timestamp) {
+      if (orderedProcesses[latestProcessIdx] -> getState() != Process::State::UNARRIVED) {
+        throw std::runtime_error("Error: unarrived process was not in UNARRIVED state.");
+      }
+      detail = orderedProcesses[latestProcessIdx] -> nextState(timestamp, tcs);
+      if (orderedProcesses[latestProcessIdx] -> getState() != Process::State::READY) {
+        throw std::runtime_error("Error: UNARRIVED process did not switch to READY state.");
+      }
+      if (addToEnd) {
+        pushLastReady(orderedProcesses[latestProcessIdx]);
+      } else {
+        pushFirstReady(orderedProcesses[latestProcessIdx]);
+      }
+      printEvent(detail, false);
+      ++latestProcessIdx;
+    }
+    
+    if (!tcsRemaining && runningProc == nullProc && switchingInProc == nullProc && switchingOutProc == nullProc && !isReadyQueueEmpty()) {
+      switchingInProc = peekFirstReady();
+      if(switchingInProc -> getState() != Process::State::READY) {
+        throw std::runtime_error("Error: process that was pulled from ready queue was not in READY state.");
+      }
+      popFirstReady();
+      printEvent(switchingInProc -> nextState(timestamp, tcs), false);
+      if (switchingInProc -> getState() != Process::State::SW_IN) {
+        throw std::runtime_error("Error: READY process did not switch to SW_IN state.");
+      }
+      resetTcsRemaining();
+      
+    }
+  
+    ++timestamp;
+  } // <<< END RR/FCFS
+  --timestamp;
+  printEvent("Simulator ended for " + std::string((fcfs?"FCFS":"RR")), true); 
+
+}
+
 bool RoundRobin::tick() {
   if (timestamp == 0) {
     for (char it = 'A'; it <= 'A' + orderedProcesses.size() - 1; ++it) {
@@ -160,8 +343,8 @@ bool RoundRobin::tick() {
         }
       }
     }
-    printEvent("Simulator started for " + std::string((fcfs?"FCFS":"RR")) + " with time slice " + std::to_string(tslice) + 
-    "ms and rr_add to " + (addToEnd?"END":"BEGINNING"), false);  
+    printEvent("Simulator started for " + std::string((fcfs?"FCFS":"RR with time slice " + std::to_string(tslice) + 
+    "ms and rr_add to " + (addToEnd?"END":"BEGINNING"))) , false);  
   }
   std::string detail; 
   if (tcsRemaining) {
@@ -228,7 +411,7 @@ bool RoundRobin::tick() {
         decrementTcs(); 
       } else if (latestProcessIdx == numProcs && ioQueue.empty()
         && switchingInProc == nullProc && switchingOutProc == nullProc) {
-        printEvent("Simulator ended for RR", true); 
+        printEvent("Simulator ended for " + std::string((fcfs?"FCFS":"RR")), true); 
         return false; // Simulation is over.
       }
     } else {
@@ -247,9 +430,12 @@ bool RoundRobin::tick() {
             
             runningProc = nullProc;
           } else {
-            ++timestamp;
-            printEvent("Time slice expired; no preemption because ready queue is empty", false); 
-            --timestamp;
+            if (!fcfs) {
+              ++timestamp;
+              
+                printEvent("Time slice expired; no preemption because ready queue is empty", false); 
+              --timestamp;
+            }
             resetBurstTimer(); 
           }
         }
