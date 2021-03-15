@@ -39,14 +39,24 @@ int main(int argc, char** argv) {
     }
   }
 
-  std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
-  RoundRobin rr(processes, tslice, tcs, addToEnd, /* FCFS: true / RR: false */false); 
-  // while(rr.tick());
-  rr.run();  
-
   std::ofstream ofs;
   ofs.open("simout.txt", std::ofstream::out | std::ofstream::trunc);
+
+  std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
+
+  // FCFS
+  RoundRobin fcfs(processes, tslice, tcs, addToEnd, /* FCFS: true */ true);
+  fcfs.run(); 
+  fcfs.printInfo(ofs);
+  fcfs.reset();
+  std::cout << std::endl;
+
+  // RR
+  RoundRobin rr(processes, tslice, tcs, addToEnd, /* FCFS: true / RR: false */false); 
+  rr.run();  
   rr.printInfo(ofs); 
+  rr.reset(); 
+  
   ofs.close(); 
   return EXIT_SUCCESS; 
 }

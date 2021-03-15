@@ -18,9 +18,9 @@
 class RoundRobin {
   public:
     RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int tcs, bool addToEnd, bool fcfs); 
-    bool tick(); 
     void printInfo(std::ostream& os) const;
     void run(); 
+    void reset();
   private:
     typedef std::vector<Process>::iterator ProcessPtr;
     typedef std::pair<unsigned int, ProcessPtr> ioQueueElem;

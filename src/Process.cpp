@@ -23,6 +23,30 @@ Process::Process(unsigned int arrivalTime,
   }
 }
 
+void Process::reset() {
+  
+  int n = cpuBurstTimes.size();
+  if (burstIdx < n) {
+    throw std::runtime_error("Error: Process::reset() called for a process that hasn't fully completed.");
+  }
+
+  for (int i : cpuBurstTimes) {
+    if (i) {
+      throw std::runtime_error("Error: found a non-zero cpuBurstTime when Process::reset() called");
+    }
+  }
+
+  for (int i = 0; i < n; ++i) {
+    cpuBurstTimes[i] = originalCpuBurstTimes[i];
+    waitingTimes[i] = 0;
+    turnaroundTimes[i] = 0;
+    burstIdx = 0;
+    numPreempts = 0;
+    numCtxSwitches = 0;
+  }
+  processState = Process::State::UNARRIVED;
+}
+
 std::pair<unsigned long long, unsigned long long> Process::getTotalCpuBurstTime() const {
   return {
     std::accumulate(originalCpuBurstTimes.begin(), originalCpuBurstTimes.end(), 0),
