@@ -164,12 +164,12 @@ time 24337ms: Process P terminated [Q <empty>]
 time 31065ms: Process F terminated [Q H O N]
 time 36372ms: Process O terminated [Q <empty>]
 time 37985ms: Process N terminated [Q <empty>]
-time 49923ms: Process E terminated [Q <empty>]
-time 52895ms: Process M terminated [Q I]
-time 69836ms: Process H terminated [Q <empty>]
-time 74756ms: Process G terminated [Q <empty>]
-time 76255ms: Process I terminated [Q <empty>]
-time 76257ms: Simulator ended for SJF [Q <empty>]
+time 49924ms: Process E terminated [Q <empty>]
+time 52896ms: Process M terminated [Q I]
+time 69837ms: Process H terminated [Q <empty>]
+time 74757ms: Process G terminated [Q <empty>]
+time 76256ms: Process I terminated [Q <empty>]
+time 76258ms: Simulator ended for SJF [Q <empty>]
 
 Process A [NEW] (arrival time 9 ms) 16 CPU bursts (tau 100ms)
 Process B [NEW] (arrival time 18 ms) 21 CPU bursts (tau 100ms)

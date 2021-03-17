@@ -29,7 +29,6 @@ mv simout.txt ownresults/simout04.txt
 ./limited.out 8 64 0.001 4096 4 0.5 2048 > ownresults/output05.txt
 mv simout.txt ownresults/simout05.txt
 
-
-cat ownresults/simout02.txt ownresults/simout03.txt ownresults/simout04.txt ownresults/simout05.txt > ownresults/simout_all.txt
+diff -q ownresults/ profresults/
 
 make clean

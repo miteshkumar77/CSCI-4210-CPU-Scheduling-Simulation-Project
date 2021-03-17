@@ -225,6 +225,7 @@ void RoundRobin::run() {
       throw std::runtime_error("Error: Processes switching in, and switching out simultaneously.");
     }
 
+    // A
     if (!tcsRemaining && switchingOutProc != nullProc) {
       if (switchingOutProc -> getState() == Process::State::SW_WAIT) {
         printEvent(switchingOutProc -> nextState(timestamp, tcs), false); 
@@ -246,6 +247,7 @@ void RoundRobin::run() {
       }
     }
 
+    // B
     // (a) CPU burst completion
     if (runningProc != nullProc) {
       if (runningProc -> getState() != Process::State::RUNNING) {
@@ -286,7 +288,7 @@ void RoundRobin::run() {
       }
     }
 
-
+    // C
     if (!tcsRemaining && switchingInProc != nullProc) {
       if (switchingInProc -> getState() != Process::State::SW_IN) {
         throw std::runtime_error("Error: Switching in process did not have correct SW_IN process state.");
@@ -301,6 +303,7 @@ void RoundRobin::run() {
       switchingInProc = nullProc;
     }
 
+    // E
     // (b) I/O burst completions
     while(!ioQueue.empty() && ioQueue.top().first <= timestamp) {
       if (ioQueue.top().second -> getState() != Process::State::WAITING) {
@@ -319,6 +322,7 @@ void RoundRobin::run() {
       ioQueue.pop(); 
     }
     
+    // F
     // (c) new process arrivals
     while(latestProcessIdx < numProcs &&
       orderedProcesses[latestProcessIdx] -> getArrivalTime() <= timestamp) {
@@ -338,6 +342,7 @@ void RoundRobin::run() {
       ++latestProcessIdx;
     }
     
+    // G
     if (!tcsRemaining && runningProc == nullProc && switchingInProc == nullProc && switchingOutProc == nullProc && !isReadyQueueEmpty()) {
       switchingInProc = peekFirstReady();
       if(switchingInProc -> getState() != Process::State::READY) {
