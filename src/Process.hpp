@@ -10,6 +10,7 @@
 #include <utility>
 #include <functional>
 #include <numeric>
+#include <cmath>
 
 class Process {
 
@@ -18,7 +19,7 @@ public:
   Process(unsigned int arrivalTime, 
     const std::vector<unsigned int>& cpuBurstTimes, 
     const std::vector<unsigned int>& ioBurstTimes,
-    double tau,
+    unsigned int tau,
     double alpha); 
   std::string nextState(unsigned int timestamp, unsigned int tcs); 
   Process::State getState() const { return processState; }
@@ -37,7 +38,11 @@ public:
   unsigned long long getNumCtxSwitches() const { return numCtxSwitches; }
   unsigned int getBurstsRemaining() const { return originalCpuBurstTimes.size() - burstIdx - 1; }
   unsigned int getRemainingBurstTime() const;
+  unsigned int getTau() const { return tau; }
+  signed long long getExpectedRemainingBurstTime() const;
   void reset();
+  bool isStartOfBurst() const;
+  unsigned int getElapsedBurstTime() const;
 private:
   void startWaitingTimer(unsigned int timestamp);
   void endWaitingTimer(unsigned int timestamp);
@@ -57,8 +62,9 @@ private:
   unsigned int burstIdx = 0;
   unsigned int numPreempts = 0;
   unsigned int numCtxSwitches = 0;
-  double tau; 
-  double alpha;
+  const unsigned int tau0;
+  unsigned int tau; 
+  const double alpha;
   State processState;
 };
 #endif

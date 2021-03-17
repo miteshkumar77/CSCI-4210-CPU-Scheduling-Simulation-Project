@@ -5,7 +5,7 @@ char Process::gpid = 'A' - 1;
 Process::Process(unsigned int arrivalTime, 
   const std::vector<unsigned int>& cpuBurstTimes, 
   const std::vector<unsigned int>& ioBurstTimes,
-  double tau,
+  unsigned int tau,
   double alpha): 
   arrivalTime(arrivalTime), 
   pid(++gpid), 
@@ -14,7 +14,7 @@ Process::Process(unsigned int arrivalTime,
   cpuBurstTimes(std::move(cpuBurstTimes)),
   waitingTimes(std::vector<unsigned int>(cpuBurstTimes.size(), 0)),
   turnaroundTimes(std::vector<unsigned int>(cpuBurstTimes.size(), 0)),
-  tau(tau), alpha(alpha),
+  tau0(tau), tau(tau), alpha(alpha),
   processState(State::UNARRIVED) {
   
   if (gpid > 'Z') {
@@ -44,6 +44,7 @@ void Process::reset() {
     numPreempts = 0;
     numCtxSwitches = 0;
   }
+  tau = tau0;
   processState = Process::State::UNARRIVED;
 }
 
@@ -87,10 +88,10 @@ void Process::recalculateTau() {
   if ((processState != Process::State::SW_WAIT) && (processState != Process::State::SW_TERM)) {
     throw std::runtime_error("Error: called recalculateTau() for process that isn't in SW_WAIT or SW_TERM");
   }
-  if (burstIdx >= originalCpuBurstTimes[burstIdx]) {
+  if (burstIdx >= originalCpuBurstTimes.size()) {
     throw std::runtime_error("Error: called recalculateTau() with out of bounds burstIdx.");
   }
-  tau = originalCpuBurstTimes[burstIdx] * alpha + (1 - alpha) * tau;  
+  tau = ceil(originalCpuBurstTimes[burstIdx] * alpha + (1 - alpha) * tau);  
 }
 
 void Process::startWaitingTimer(unsigned int timestamp) {
@@ -126,6 +127,32 @@ void Process::endTurnaroundTimer(unsigned int timestamp) {
   turnaroundTimer = -1;
 }
 
+bool Process::isStartOfBurst() const {
+  if (burstIdx >= originalCpuBurstTimes.size()) {
+    throw std::runtime_error("Error: isStartOfBurst() called for a process with out of bounds burstIdx.");
+  }
+  return cpuBurstTimes[burstIdx] == originalCpuBurstTimes[burstIdx];
+}
+
+unsigned int Process::getElapsedBurstTime() const {
+  if (burstIdx >= originalCpuBurstTimes.size()) {
+    throw std::runtime_error("Error: getElapsedBurstTime() called for a process with out of bounds burstIdx.");
+  }
+
+  if (originalCpuBurstTimes[burstIdx] < cpuBurstTimes[burstIdx]) {
+    throw std::runtime_error("Error: original cpu burst time was lower than current cpu burst time.");
+  }
+  return originalCpuBurstTimes[burstIdx] - cpuBurstTimes[burstIdx];
+}
+
+
+signed long long Process::getExpectedRemainingBurstTime() const {
+  if (burstIdx >= originalCpuBurstTimes.size()) {
+    throw std::runtime_error("Error: getExpectedRemainingBurstTime() called for a process with out of bounds burstIdx.");
+  }
+
+  return static_cast<signed long int>(getTau()) -  static_cast<signed long int>(getElapsedBurstTime());
+}
 std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
   
   std::string detail = ""; 
@@ -140,11 +167,7 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       break;
     case Process::State::READY: // -> SW_IN
       processState = Process::State::SW_IN;
-      if (cpuBurstTimes[burstIdx] == originalCpuBurstTimes[burstIdx]) {
-        endWaitingTimer(timestamp);
-      } else {
-        endWaitingTimer(timestamp);
-      }
+      endWaitingTimer(timestamp);
       break;
     case Process::State::SW_READY: // -> READY
       processState = Process::State::READY;
@@ -154,7 +177,7 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       ++numCtxSwitches;
       processState = Process::State::RUNNING; 
       if (timestamp < MAX_OUTPUT_TS) {
-        if (cpuBurstTimes[burstIdx] == originalCpuBurstTimes[burstIdx]) {  
+        if (isStartOfBurst()) {  
           detail = "Process " + std::string(1, getPid()) + " started using the CPU for " 
             + std::to_string(cpuBurstTimes[burstIdx]) + "ms burst"; 
         } else {
@@ -207,6 +230,7 @@ Process::State Process::decrementBurst() {
       processState = Process::State::SW_TERM; 
     } else {
       processState = Process::State::SW_WAIT; 
+      recalculateTau(); 
     }
   }
   return processState;

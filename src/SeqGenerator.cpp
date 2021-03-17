@@ -56,7 +56,7 @@ std::vector<Process> SeqGenerator::parseProcesses(std::string fname) {
     for (unsigned int j = 0; j < nIoBursts; ++j) {
       fscanf(fp, "%u", &ioBurstTimes[j]); 
     }
-    processes.push_back(Process(arrivalTime, cpuBurstTimes, ioBurstTimes, 1/lambda, alpha)); 
+    processes.push_back(Process(arrivalTime, cpuBurstTimes, ioBurstTimes, ceil(1/lambda), alpha)); 
   }
 
   return processes;
@@ -80,7 +80,7 @@ std::vector<Process> SeqGenerator::generateProccesses(unsigned short n, double l
         ioBurstTimes[j] = 10 * ceilNextExp(lambda, maxval); 
       }
     }
-    processes.push_back(Process(arrivalTime, cpuBurstTimes, ioBurstTimes, 1/lambda, alpha)); 
+    processes.push_back(Process(arrivalTime, cpuBurstTimes, ioBurstTimes, ceil(1/lambda), alpha)); 
   }
   return processes;
 }

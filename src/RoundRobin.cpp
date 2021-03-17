@@ -208,7 +208,6 @@ void RoundRobin::run() {
         isReadyQueueEmpty() && 
         latestProcessIdx >= orderedProcesses.size() &&
         ioQueue.empty()) {
-
       break;
     }
     

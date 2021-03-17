@@ -6,6 +6,7 @@
 #include "SeqGenerator.hpp"
 #include "Process.hpp"
 #include "RoundRobin.hpp"
+#include "ShortestRemainingTime.hpp"
 
 /* [n: number of processes] [seed] [lambda] [limit] [tcs] [alpha] [tslice] [rr_add: BEGINNING or END] */
 int main(int argc, char** argv) {
@@ -44,19 +45,25 @@ int main(int argc, char** argv) {
 
   std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
 
-  // FCFS
-  RoundRobin fcfs(processes, tslice, tcs, addToEnd, /* FCFS: true */ true);
-  fcfs.run(); 
-  fcfs.printInfo(ofs);
-  fcfs.reset();
-  std::cout << std::endl;
+  // // FCFS
+  // RoundRobin fcfs(processes, tslice, tcs, addToEnd, /* FCFS: true */ true);
+  // fcfs.run(); 
+  // fcfs.printInfo(ofs);
+  // fcfs.reset();
+  // std::cout << std::endl;
 
-  // RR
-  RoundRobin rr(processes, tslice, tcs, addToEnd, /* FCFS: true / RR: false */false); 
-  rr.run();  
-  rr.printInfo(ofs); 
-  rr.reset(); 
+  // // RR
+  // RoundRobin rr(processes, tslice, tcs, addToEnd, /* FCFS: true / RR: false */false); 
+  // rr.run();  
+  // rr.printInfo(ofs); 
+  // rr.reset(); 
   
+  // SRT
+  ShortestRemainingTime srt(processes, tcs, false); 
+  srt.run();
+  srt.printInfo(ofs);
+  srt.reset(); 
+
   ofs.close(); 
   return EXIT_SUCCESS; 
 }
