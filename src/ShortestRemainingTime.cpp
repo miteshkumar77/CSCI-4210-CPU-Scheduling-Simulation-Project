@@ -305,8 +305,13 @@ void ShortestRemainingTime::run() {
       if (switchingInProc -> getState() != Process::State::SW_IN) {
         throw std::runtime_error("Error: Switching in process did not have correct SW_IN process state.");
       }
-      printEvent(fmtProc(switchingInProc) + " started using the CPU with " + 
-        std::to_string(switchingInProc -> getRemainingBurstTime()) + "ms burst remaining", false);
+      if (sjf) {
+        printEvent(fmtProc(switchingInProc) + " started using the CPU for " + 
+          std::to_string(switchingInProc -> getRemainingBurstTime()) + "ms burst", false);
+      } else {
+        printEvent(fmtProc(switchingInProc) + " started using the CPU with " + 
+          std::to_string(switchingInProc -> getRemainingBurstTime()) + "ms burst remaining", false);
+      }
       switchingInProc -> nextState(timestamp, tcs);
       if (switchingInProc -> getState() != Process::State::RUNNING) {
         throw std::runtime_error("Error: SW_IN process did not switch to RUNNING state.");

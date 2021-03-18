@@ -29,6 +29,14 @@ mv simout.txt ownresults/simout04.txt
 ./limited.out 8 64 0.001 4096 4 0.5 2048 > ownresults/output05.txt
 mv simout.txt ownresults/simout05.txt
 
-diff -q ownresults/ profresults/
+mkdir -p diff-files
+names=`ls ownresults/*.txt | xargs -n 1 basename`
+for fname in $names; do
+  diff "ownresults/$fname" "profresults/$fname" > "diff-files/diff-$fname"
+done
 
-make clean
+cat diff-files/* > diff.txt
+
+
+
+# make clean
