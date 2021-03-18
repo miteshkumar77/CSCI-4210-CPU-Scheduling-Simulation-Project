@@ -313,7 +313,7 @@ void RoundRobin::run() {
       if (ioQueue.top().second -> getState() != Process::State::READY) {
         throw std::runtime_error("Error: WAITING process did not switch to READY state.");
       }
-      if (addToEnd) {
+      if (fcfs || addToEnd) {
         pushLastReady(ioQueue.top().second);
       } else {
         pushFirstReady(ioQueue.top().second);
@@ -333,7 +333,7 @@ void RoundRobin::run() {
       if (orderedProcesses[latestProcessIdx] -> getState() != Process::State::READY) {
         throw std::runtime_error("Error: UNARRIVED process did not switch to READY state.");
       }
-      if (addToEnd) {
+      if (fcfs || addToEnd) {
         pushLastReady(orderedProcesses[latestProcessIdx]);
       } else {
         pushFirstReady(orderedProcesses[latestProcessIdx]);

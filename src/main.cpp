@@ -24,8 +24,13 @@ int main(int argc, char** argv) {
   int tcs = atoi(*(argv + 5)); 
   double alpha = std::stod(*(argv + 6));
   int tslice = atoi(*(argv + 7)); 
-  if (tslice % 2 != 0) {
-    std::cerr << "ERROR: tslice isn't an even number." << std::endl;
+  if (tcs % 2 != 0 && tcs <= 0) {
+    std::cerr << "ERROR: tcs isn't a positive even number." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (tslice <= 0) {
+    std::cerr << "ERROR: tslice isn't a positive number." << std::endl;
     return EXIT_FAILURE;
   }
 
