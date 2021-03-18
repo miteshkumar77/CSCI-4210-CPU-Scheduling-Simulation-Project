@@ -1,3 +1,24 @@
+/**
+ *  CSCI 4210 Operating Systems
+ *  2021 Spring
+ * 
+ *  Simulation Project - RoundRobin.hpp
+ * 
+ *  Authors:
+ *    Mitesh Kumar  [kumarm4]
+ *    Jason Lam     [ lamj7 ]
+ *    William He    [ hew7  ]
+ * 
+ *  Brief:
+ *    Implementation of Round Robin (RR) scheduling algorithm that can be converted to 
+ *    First-Come-First-Served (FCFS) by passing fcfs=true to the constructor.
+ *    
+ *    run() runs the simulation and outputs important events to terminal in chronological order
+ *    printInfo() can be called successfully after run() has completed and will print the final calculated statistics 
+ *                of the run to a output stream. 
+ *    reset() resets the object for a future run and resets the internal processes to their initial state.
+ */
+
 #ifndef ROUNDROBIN_HPP
 #define ROUNDROBIN_HPP
 

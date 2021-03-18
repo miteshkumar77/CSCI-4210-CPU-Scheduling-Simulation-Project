@@ -1,3 +1,18 @@
+/**
+ *  CSCI 4210 Operating Systems
+ *  2021 Spring
+ * 
+ *  Simulation Project - main.cpp
+ * 
+ *  Authors:
+ *    Mitesh Kumar  [kumarm4]
+ *    Jason Lam     [ lamj7 ]
+ *    William He    [ hew7  ]
+ *  
+ *  Brief:
+ *    Entrypoint.
+ */
+
 #include <stdlib.h>
 #include <iostream>
 #include <limits>
@@ -8,11 +23,28 @@
 #include "RoundRobin.hpp"
 #include "ShortestRemainingTime.hpp"
 
+// 1. rr_add meaning
+
+// 4. Also, is tcs = 0 an invalid input?
+
+// 2. If a process is context switching in and another process arrives from I/O or newly arrived with lower tau, should we print "[new process] will preempt [context switching in process]"? or should 
+// we wait for the context switching in process to first print "[context switching in process] began using CPU" (without actually running any of the context switching in process's code)?
+
+// 3. Also I don't understand why SJF will use "started using the CPU for <rem>ms burst"
+// but SRT will only use "started using the CPU with <rem>ms remaining". 
+
+// Isn't the start of the burst always supposed to be "started using the CPU for <rem>ms burst" 
+
+// and if it resumed the burst after a preemption it should be "started using the CPU with <rem>ms remaining"?
+
+
+
+
 /* [n: number of processes] [seed] [lambda] [limit] [tcs] [alpha] [tslice] [rr_add: BEGINNING or END] */
 int main(int argc, char** argv) {
   
   if (argc != 8 && argc != 9) {
-    std::cerr << "ERROR: incorrect argc." << std::endl;
+    std::cerr << "ERROR: usage [executable] [n: number of processes] [seed] [lambda] [limit] [tcs] [alpha] [tslice] [rr_add: BEGINNING or END]" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -72,7 +104,7 @@ int main(int argc, char** argv) {
   std::cout << std::endl;
 
   // RR
-  RoundRobin rr(processes, tslice, tcs, addToEnd, /* RR: false */false); 
+  RoundRobin rr(processes, tslice, tcs, addToEnd, /* RR: false */ false); 
   rr.run();  
   rr.printInfo(ofs); 
   rr.reset(); 

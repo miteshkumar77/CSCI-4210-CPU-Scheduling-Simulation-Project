@@ -1,3 +1,16 @@
+/**
+ *  CSCI 4210 Operating Systems
+ *  2021 Spring
+ * 
+ *  Simulation Project - ShortestRemainingTime.cpp
+ * 
+ *  Authors:
+ *    Mitesh Kumar  [kumarm4]
+ *    Jason Lam     [ lamj7 ]
+ *    William He    [ hew7  ]
+ * 
+ */
+
 #include "ShortestRemainingTime.hpp"
 
 

@@ -1,3 +1,15 @@
+/**
+ *  CSCI 4210 Operating Systems
+ *  2021 Spring
+ * 
+ *  Simulation Project - Process.cpp
+ * 
+ *  Authors:
+ *    Mitesh Kumar  [kumarm4]
+ *    Jason Lam     [ lamj7 ]
+ *    William He    [ hew7  ]
+ */
+
 #include "Process.hpp"
 
 char Process::gpid = 'A' - 1; 
@@ -191,10 +203,8 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       endTurnaroundTimer(timestamp);
       break;
     case Process::State::WAITING: // -> READY
-      waitingTimes[burstIdx];
       ++burstIdx;
       processState = Process::State::READY;
-      
       if (timestamp < MAX_OUTPUT_TS) {
         detail = "Process " + std::string(1, getPid()) + " completed I/O; placed on ready queue";
       }
@@ -202,7 +212,6 @@ std::string Process::nextState(unsigned int timestamp, unsigned int tcs) {
       startTurnaroundTimer(timestamp);
       break;
     case Process::State::SW_TERM: // -> TERMINATED
-      waitingTimes[burstIdx];
       processState = Process::State::TERMINATED;
       endTurnaroundTimer(timestamp);
       ++burstIdx;

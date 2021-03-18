@@ -1,3 +1,24 @@
+/**
+ *  CSCI 4210 Operating Systems
+ *  2021 Spring
+ * 
+ *  Simulation Project - ShortestRemainingTime.hpp
+ * 
+ *  Authors:
+ *    Mitesh Kumar  [kumarm4]
+ *    Jason Lam     [ lamj7 ]
+ *    William He    [ hew7  ]
+ * 
+ *  Brief:
+ *    Implementation of Shortest Remaining Time (SRT) scheduling algorithm that can be converted to 
+ *    Shortest Job First (SJF) by passing sjf=true to the constructor.
+ *    
+ *    run() runs the simulation and outputs important events to terminal in chronological order
+ *    printInfo() can be called successfully after run() has completed and will print the final calculated statistics 
+ *                of the run to a output stream. 
+ *    reset() resets the object for a future run and resets the internal processes to their initial state.
+ */
+
 #ifndef SHORTESTREMAININGTIME_HPP
 #define SHORTESTREMAININGTIME_HPP
 

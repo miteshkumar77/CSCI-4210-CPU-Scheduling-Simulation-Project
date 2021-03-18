@@ -1,3 +1,15 @@
+/**
+ *  CSCI 4210 Operating Systems
+ *  2021 Spring
+ * 
+ *  Simulation Project - SeqGenerator.hpp
+ * 
+ *  Authors:
+ *    Mitesh Kumar  [kumarm4]
+ *    Jason Lam     [ lamj7 ]
+ *    William He    [ hew7  ]
+ */
+
 #ifndef SEQGENERATOR_HPP
 #define SEQGENERATOR_HPP
 
