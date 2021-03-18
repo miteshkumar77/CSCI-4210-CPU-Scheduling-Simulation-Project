@@ -52,7 +52,7 @@ std::vector<Process> SeqGenerator::parseProcesses(std::string fname) {
   fscanf(fp, "%u", &n);
   std::vector<Process> processes;
   processes.reserve(n); 
-  for (int i = 0; i < n; ++i) {
+  for (unsigned int i = 0; i < n; ++i) {
     fscanf(fp, "%u", &arrivalTime);
     fscanf(fp, "%u", &nCpuBursts);
     if (nCpuBursts == 0) {

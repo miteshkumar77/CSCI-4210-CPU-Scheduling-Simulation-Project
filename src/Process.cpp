@@ -37,7 +37,7 @@ Process::Process(unsigned int arrivalTime,
 
 void Process::reset() {
   
-  int n = cpuBurstTimes.size();
+  unsigned int n = cpuBurstTimes.size();
   if (burstIdx < n) {
     throw std::runtime_error("Error: Process::reset() called for a process that hasn't fully completed.");
   }
@@ -48,7 +48,7 @@ void Process::reset() {
     }
   }
 
-  for (int i = 0; i < n; ++i) {
+  for (unsigned int i = 0; i < n; ++i) {
     cpuBurstTimes[i] = originalCpuBurstTimes[i];
     waitingTimes[i] = 0;
     turnaroundTimes[i] = 0;
@@ -68,11 +68,16 @@ std::pair<unsigned long long, unsigned long long> Process::getTotalCpuBurstTime(
 }
 std::pair<unsigned long long, unsigned long long> Process::getTotalWaitTime() const {
   return {
-    std::accumulate(waitingTimes.begin(), waitingTimes.end(), 0, [](unsigned int acc, unsigned int prev) -> unsigned long long {
-      return (prev == -1)?acc:acc+prev; 
-    }),
+    std::accumulate(waitingTimes.begin(), waitingTimes.end(), 0),
     waitingTimes.size()
   };
+
+  // return {
+  //   std::accumulate(waitingTimes.begin(), waitingTimes.end(), 0, [](unsigned int acc, signed int prev) -> unsigned long long {
+  //     return (prev == -1)?acc:acc+prev; 
+  //   }),
+  //   waitingTimes.size()
+  // };
 }
 
 std::pair<unsigned long long, unsigned long long> Process::getTotalTurnaroundTime() const {

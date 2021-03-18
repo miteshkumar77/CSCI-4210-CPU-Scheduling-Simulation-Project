@@ -19,7 +19,7 @@
 #include <limits>
 
 #ifndef DISPLAY_MAX_T
-#define MAX_OUTPUT_TS std::numeric_limits<int>::max()
+#define MAX_OUTPUT_TS std::numeric_limits<unsigned int>::max()
 #else
 #define MAX_OUTPUT_TS DISPLAY_MAX_T
 #endif

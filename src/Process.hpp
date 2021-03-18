@@ -59,7 +59,7 @@ public:
   unsigned int getNumBursts() const { return originalCpuBurstTimes.size(); }
   void printInfo() const;
   void preempt(); 
-  int getArrivalTime() const { return arrivalTime; }
+  unsigned int getArrivalTime() const { return arrivalTime; }
   std::pair<unsigned long long, unsigned long long> getTotalCpuBurstTime() const; 
   std::pair<unsigned long long, unsigned long long> getTotalWaitTime() const;
   std::pair<unsigned long long, unsigned long long> getTotalTurnaroundTime() const;

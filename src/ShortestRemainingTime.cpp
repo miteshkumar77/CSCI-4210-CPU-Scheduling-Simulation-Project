@@ -213,7 +213,7 @@ void ShortestRemainingTime::checkRep() const {
 
 void ShortestRemainingTime::run() {
   checkRep();
-  for (char it = 'A'; it <= 'A' + orderedProcesses.size() - 1; ++it) {
+  for (char it = 'A'; it <= static_cast<char>('A' + orderedProcesses.size() - 1); ++it) {
     for (auto& proc : orderedProcesses) {
       if (proc -> getPid() == it) {
         std::cout << "Process " << it << " [NEW] (arrival time " << proc -> getArrivalTime() << " ms) ";
@@ -443,8 +443,9 @@ void ShortestRemainingTime::run() {
     ++timestamp;
     checkRep();
   } // <<< END SRT/SJF
-
-  --timestamp;
+  if (timestamp > 0) {
+    --timestamp;
+  }
   printEvent("Simulator ended for " + std::string((sjf?"SJF":"SRT")), true); 
 
 }

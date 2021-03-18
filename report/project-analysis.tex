@@ -10,8 +10,8 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{$<$\textbf{kumarm4}$>$, $<$\textbf{lamj7}$>$, $<$\textbf{hew7}$>$}
-\lhead{Simulation Project Analysis}
+\lhead{Mitesh Kumar {\tt <kumarm4>}, Jason Lam {\tt <lamj7>}, William He {\tt <hew7>}}
+\rhead{Simulation Project Analysis}
 \rfoot{\thepage}
  \geometry{
  a4paper,
@@ -23,17 +23,28 @@
 
 \newcommand{\sectionbreak}{\clearpage}
 
-\title{\textbf{Simulation Project Analysis}}
-\author{Mitesh Kumar $<$\textbf{kumarm4}$>$, Jason Lam $<$\textbf{lamj7}$>$, William He $<$\textbf{hew7}$>$}
+\title{\textbf{Simulation Project Analysis} \\ 
+       \textbf{CSCI-4210} \\ 
+       \textbf{Operating Systems}}
+\author{Mitesh Kumar {\tt <kumarm4>}, Jason Lam {\tt <lamj7>}, William He {\tt <hew7>}}
 
 
 \begin{document}
 \maketitle
 
 \section{Best Algorithm for CPU-bound vs I/O-bound Processes}
-\section{RR Algorithm With {\tt rr\_add} set to {\tt BEGINNING} vs {\tt END}}
+\section{RR Algorithm With {\tt $rr_{add}$} set to {\tt BEGINNING} vs {\tt END}}
 \section{Comparison Between SJF and SRT}
 \section{Limitations of Our Simulation}
 \section{Priority Scheduling Algorithm of Our Own Design}
 \section{Appendix}
+\subsection*{Program Arguments}
+{\tt[executable] [$n$] [seed] [$\lambda$] [limit] [$t_{cs}$] [$\alpha$] [$t_{slice}$] [$rr_{add}$: BEGINNING or END, default: END]}
+
+\subsection*{Program Execution Data}
+
+\begin{table}[h!]
+  \caption{{\tt [$n$: 2] [seed: 2] [$\lambda$: 0.01] [limit: 256] [$t_{cs}$: 4] [$\alpha$: 0.5] [$t_{slice}$: 128]}}
+  
+\end{table}
 \end{document}

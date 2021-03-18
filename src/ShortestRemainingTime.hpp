@@ -72,8 +72,8 @@ class ShortestRemainingTime {
     static const std::function<bool(const ioQueueElem&, const ioQueueElem&)> processIoComparator;
     static const std::function<bool(const ProcessPtr&, const ProcessPtr&)> readyQueueComparator;
     std::deque<ProcessPtr> readyQueue;
-    int latestProcessIdx = 0;
-    int timestamp = 0;
+    unsigned int latestProcessIdx = 0;
+    unsigned int timestamp = 0;
     unsigned int burstRemaining = 0;
     unsigned int tcsRemaining = 0;
     

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 mkdir -p ownresults
-rm -f ownresults/output*.txt
-rm -f ownresults/simout*.txt
+rm -rf ownresults/output*.txt
+rm -rf ownresults/simout*.txt
 make clean && make full
 
 
