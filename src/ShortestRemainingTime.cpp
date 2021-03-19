@@ -5,9 +5,9 @@
  *  Simulation Project - ShortestRemainingTime.cpp
  * 
  *  Authors:
- *    Mitesh Kumar  [kumarm4]
- *    Jason Lam     [ lamj7 ]
- *    William He    [ hew7  ]
+ *    Mitesh Kumar  [ kumarm4 ]
+ *    Jason Lam     [  lamj7  ]
+ *    William He    [  hew7   ]
  * 
  */
 
@@ -163,7 +163,6 @@ void ShortestRemainingTime::preemptRunningProc() {
   if (sjf) {
     throw std::runtime_error("Error: preemptRunningProc() calle for SJF.");
   }
-  // printEvent("Time slice expired; process " + std::string(1, runningProc -> getPid()) + " preempted with " + std::to_string(runningProc -> getRemainingBurstTime()) + "ms to go", false);
   runningProc -> preempt();
 }
 
@@ -183,18 +182,6 @@ void ShortestRemainingTime::printEvent(const std::string& detail, bool term) con
   std::cout << (readyQueue.empty()?"<empty>":std::string(1, readyQueue.back() -> getPid())) << "]" << std::endl;
 }
 
-
-/*
-
-
-A if context switch in completed, start running the process
-B decrement burst timer on running process, preempt or finish burst and start a context switch out
-C if no running process or context switching process, pull next process from ready queue and begin context switch in
-D io queue to ready queue
-E new process arrival add to ready queue
-
-
-*/
 
 void ShortestRemainingTime::checkRep() const {
   if (runningProc != nullProc && switchingOutProc != nullProc) {
@@ -237,15 +224,7 @@ void ShortestRemainingTime::run() {
       
       break;
     }
-    
-    // std::cout << (int)(switchingOutProc == nullProc) << ' '
-    //   << (int)(switchingInProc == nullProc) << ' '
-    //   << (int)(runningProc == nullProc) << ' '
-    //   << (int)(isReadyQueueEmpty()) << ' '
-    //   << (int)(latestProcessIdx >= orderedProcesses.size()) << ' '
-    //   << (int)ioQueue.empty() << ' '
-    //   << timestamp << ' '
-    //   << ioQueue.size() << std::endl;
+
 
     if (tcsRemaining) {
       // decrement context switch timer
@@ -415,7 +394,6 @@ void ShortestRemainingTime::run() {
     }
     
 
-    // A B C E F G
 
     // G
     if (!tcsRemaining && runningProc == nullProc && switchingInProc == nullProc && switchingOutProc == nullProc && !isReadyQueueEmpty()) {
@@ -431,14 +409,6 @@ void ShortestRemainingTime::run() {
       resetTcsRemaining();
       
     }
-
-    // if (timestamp == 17408) {
-    //   if (switchingOutProc != nullProc) {
-    //     std::cout << "Switching Out Proc: " << 
-    //   }  
-    // }
-
-    
     
     ++timestamp;
     checkRep();

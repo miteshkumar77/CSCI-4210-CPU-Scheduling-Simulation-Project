@@ -5,9 +5,9 @@
  *  Simulation Project - globals.hpp
  * 
  *  Authors:
- *    Mitesh Kumar  [kumarm4]
- *    Jason Lam     [ lamj7 ]
- *    William He    [ hew7  ]
+ *    Mitesh Kumar  [ kumarm4 ]
+ *    Jason Lam     [  lamj7  ]
+ *    William He    [  hew7   ]
  * 
  *  Brief: 
  *    Place to store any global constants defined at compile time (e.g. DISPLAY_MAX_T)

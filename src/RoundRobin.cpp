@@ -5,9 +5,9 @@
  *  Simulation Project - RoundRobin.cpp
  * 
  *  Authors:
- *    Mitesh Kumar  [kumarm4]
- *    Jason Lam     [ lamj7 ]
- *    William He    [ hew7  ]
+ *    Mitesh Kumar  [ kumarm4 ]
+ *    Jason Lam     [  lamj7  ]
+ *    William He    [  hew7   ]
  */
 
 #include "RoundRobin.hpp"
@@ -182,19 +182,6 @@ void RoundRobin::printEvent(const std::string& detail, bool term) const {
   }
   std::cout << (readyQueue.empty()?"<empty>":std::string(1, readyQueue.back() -> getPid())) << "]" << std::endl;
 }
-
-
-/*
-
-
-A if context switch in completed, start running the process
-B decrement burst timer on running process, preempt or finish burst and start a context switch out
-C if no running process or context switching process, pull next process from ready queue and begin context switch in
-D io queue to ready queue
-E new process arrival add to ready queue
-
-
-*/
 
 
 void RoundRobin::run() {

@@ -5,9 +5,9 @@
  *  Simulation Project - Process.cpp
  * 
  *  Authors:
- *    Mitesh Kumar  [kumarm4]
- *    Jason Lam     [ lamj7 ]
- *    William He    [ hew7  ]
+ *    Mitesh Kumar  [ kumarm4 ]
+ *    Jason Lam     [  lamj7  ]
+ *    William He    [  hew7   ]
  */
 
 #include "Process.hpp"
@@ -71,13 +71,6 @@ std::pair<unsigned long long, unsigned long long> Process::getTotalWaitTime() co
     std::accumulate(waitingTimes.begin(), waitingTimes.end(), 0),
     waitingTimes.size()
   };
-
-  // return {
-  //   std::accumulate(waitingTimes.begin(), waitingTimes.end(), 0, [](unsigned int acc, signed int prev) -> unsigned long long {
-  //     return (prev == -1)?acc:acc+prev; 
-  //   }),
-  //   waitingTimes.size()
-  // };
 }
 
 std::pair<unsigned long long, unsigned long long> Process::getTotalTurnaroundTime() const {

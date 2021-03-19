@@ -5,9 +5,9 @@
  *  Simulation Project - SeqGenerator.hpp
  * 
  *  Authors:
- *    Mitesh Kumar  [kumarm4]
- *    Jason Lam     [ lamj7 ]
- *    William He    [ hew7  ]
+ *    Mitesh Kumar  [ kumarm4 ]
+ *    Jason Lam     [  lamj7  ]
+ *    William He    [  hew7   ]
  */
 
 #ifndef SEQGENERATOR_HPP
