@@ -10,7 +10,7 @@
  *    William He    [  hew7   ]
  */
 
-#include "SeqGenerator.hpp"
+#include "SeqGenerator.h"
 
 
 inline double SeqGenerator::nextExp(double lambda) {
@@ -33,7 +33,7 @@ unsigned int SeqGenerator::ceilNextExp(double lambda, double maxval) {
   return res;
 }
 
-std::vector<Process> SeqGenerator::parseProcesses(std::string fname) {
+std::vector<Process> SeqGenerator::parseProcesses(std::string fname, double lambda, unsigned int tcs, double alpha, unsigned int tslice) {
   FILE* fp;
   if (NULL == (fp = fopen(fname.c_str(), "r"))) {
     throw std::runtime_error("Error: could not open file.");
@@ -45,9 +45,7 @@ std::vector<Process> SeqGenerator::parseProcesses(std::string fname) {
   unsigned int arrivalTime;
   unsigned int nCpuBursts;
   unsigned int nIoBursts;
-  double lambda;
-  double alpha;
-  fscanf(fp, "%lf%lf", &lambda, &alpha);
+  // fscanf(fp, "%lf%lf", &lambda, &alpha);
 
   fscanf(fp, "%u", &n);
   std::vector<Process> processes;

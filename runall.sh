@@ -35,6 +35,10 @@ mv simout.txt ownresults/simout05.txt
 ./limited.out 8 64 0.001 4096 4 0.5 2048 BEGINNING > ownresults/output06.txt
 mv simout.txt ownresults/simout06.txt
 
+./limited.out 8 64 0.001 4096 20 0.5 2048 > ownresults/output06.txt
+mv simout.txt ownresults/simout07.txt
+
+
 mkdir -p diff-files
 names=`ls ownresults/*.txt | xargs -n 1 basename`
 for fname in $names; do
@@ -42,5 +46,7 @@ for fname in $names; do
 done
 
 cat diff-files/* > diff.txt
+
+cat ownresults/simout*.txt > ownresults/all_simout.txt
 
 make clean

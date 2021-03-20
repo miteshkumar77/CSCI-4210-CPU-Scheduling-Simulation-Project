@@ -10,7 +10,7 @@
  *    William He    [  hew7   ]
  */
 
-#include "Process.hpp"
+#include "Process.h"
 
 char Process::gpid = 'A' - 1; 
 

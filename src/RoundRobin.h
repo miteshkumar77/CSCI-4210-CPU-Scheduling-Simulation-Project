@@ -2,7 +2,7 @@
  *  CSCI 4210 Operating Systems
  *  2021 Spring
  * 
- *  Simulation Project - ShortestRemainingTime.hpp
+ *  Simulation Project - RoundRobin.hpp
  * 
  *  Authors:
  *    Mitesh Kumar  [ kumarm4 ]
@@ -10,8 +10,8 @@
  *    William He    [  hew7   ]
  * 
  *  Brief:
- *    Implementation of Shortest Remaining Time (SRT) scheduling algorithm that can be converted to 
- *    Shortest Job First (SJF) by passing sjf=true to the constructor.
+ *    Implementation of Round Robin (RR) scheduling algorithm that can be converted to 
+ *    First-Come-First-Served (FCFS) by passing fcfs=true to the constructor.
  *    
  *    run() runs the simulation and outputs important events to terminal in chronological order
  *    printInfo() can be called successfully after run() has completed and will print the final calculated statistics 
@@ -19,8 +19,8 @@
  *    reset() resets the object for a future run and resets the internal processes to their initial state.
  */
 
-#ifndef SHORTESTREMAININGTIME_HPP
-#define SHORTESTREMAININGTIME_HPP
+#ifndef ROUNDROBIN_HPP
+#define ROUNDROBIN_HPP
 
 #include <deque>
 #include <queue>
@@ -29,27 +29,31 @@
 #include <functional>
 #include <exception>
 #include <stdexcept>
-#include "Process.hpp"
+#include "Process.h"
 #include <utility>
 #include <string>
 #include <sstream>
 #include <iostream>
 
 
-class ShortestRemainingTime {
+class RoundRobin {
   public:
-    ShortestRemainingTime(std::vector<Process>& processes, unsigned int tcs, bool sjf); 
+    RoundRobin(std::vector<Process>& processes, unsigned int tslice, unsigned int tcs, bool addToEnd, bool fcfs); 
     void printInfo(std::ostream& os) const;
     void run(); 
     void reset();
+    void printCsv(std::ostream& os) const;
   private:
     typedef std::vector<Process>::iterator ProcessPtr;
     typedef std::pair<unsigned int, ProcessPtr> ioQueueElem;
+
     void printEvent(const std::string& detail, bool term) const; 
     bool isReadyQueueEmpty() const { return readyQueue.empty(); }
+    ProcessPtr peekLastReady() const;
     ProcessPtr peekFirstReady() const;
     void popFirstReady(); 
-    void pushReady(ProcessPtr processPtr);
+    void pushLastReady(ProcessPtr processPtr);
+    void pushFirstReady(ProcessPtr processPtr);
     Process::State decrementBurstTimer(); 
     void pushIo(ProcessPtr processPtr); 
 
@@ -60,17 +64,15 @@ class ShortestRemainingTime {
     unsigned long long calcTotalNumPreemptions() const;
     double calcCpuUtilization() const { return 100.0 * (double)cpuUsageTime/timestamp; }
     void resetTcsRemaining(); 
-    void checkRep() const;
+    void resetBurstTimer();
+    
     void decrementTcs();
     void preemptRunningProc();
     inline bool burstTimerElapsed() const { return burstRemaining == 0; }
-    std::string fmtProc(const ProcessPtr& p) const;
-    std::string fmtRecalcTau(const ShortestRemainingTime::ProcessPtr& p) const;
 
     // Independent
     static const std::function<bool(const ProcessPtr&, const ProcessPtr&)> processArrivalComparator; 
     static const std::function<bool(const ioQueueElem&, const ioQueueElem&)> processIoComparator;
-    static const std::function<bool(const ProcessPtr&, const ProcessPtr&)> readyQueueComparator;
     std::deque<ProcessPtr> readyQueue;
     unsigned int latestProcessIdx = 0;
     unsigned int timestamp = 0;
@@ -79,15 +81,17 @@ class ShortestRemainingTime {
     
     unsigned int cpuUsageTime = 0;
 
-    // Default  
+    // Default
     std::priority_queue<ioQueueElem, std::vector<ioQueueElem>, decltype(processIoComparator)> ioQueue;
+    const unsigned int tslice;
     const unsigned int tcs;
     const unsigned int numProcs;
     ProcessPtr runningProc;
     ProcessPtr switchingOutProc;
     ProcessPtr switchingInProc;
     const ProcessPtr nullProc;
-    const bool sjf;
+    const bool addToEnd;
+    const bool fcfs;
 
     // Non-Default
     std::vector<ProcessPtr> orderedProcesses;

@@ -10,7 +10,7 @@
  *    William He    [  hew7   ]
  */
 
-#include "RoundRobin.hpp"
+#include "RoundRobin.h"
 
 const std::function<bool(const RoundRobin::ProcessPtr&, const RoundRobin::ProcessPtr&)> 
 RoundRobin::processArrivalComparator =
@@ -421,4 +421,11 @@ void RoundRobin::printInfo(std::ostream& os) const {
   os.precision(3);
   os << "-- CPU utilization: " << std::fixed << calcCpuUtilization() << "%" << std::endl;
   
+}
+
+void RoundRobin::printCsv(std::ostream& os) const {
+  os << (fcfs?"FCFS":"RR") << "," << calcAvgCpuBurstTime() << ",";
+  os << calcAvgWaitTime() << "," << calcAvgTurnaroundTime() << ",";
+  os << calcTotalNumCtxSwitches() << "," << calcTotalNumPreemptions() << ",";
+  os << calcCpuUtilization() << "," << std::endl;
 }

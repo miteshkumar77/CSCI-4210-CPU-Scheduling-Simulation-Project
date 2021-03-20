@@ -11,7 +11,7 @@
  * 
  */
 
-#include "ShortestRemainingTime.hpp"
+#include "ShortestRemainingTime.h"
 
 
 
@@ -478,4 +478,11 @@ void ShortestRemainingTime::printInfo(std::ostream& os) const {
   os.precision(3);
   os << "-- CPU utilization: " << std::fixed << calcCpuUtilization() << "%" << std::endl;
   
+}
+
+void ShortestRemainingTime::printCsv(std::ostream& os) const {
+  os << (sjf?"SJF":"SRT") << "," << calcAvgCpuBurstTime() << ",";
+  os << calcAvgWaitTime() << "," << calcAvgTurnaroundTime() << ",";
+  os << calcTotalNumCtxSwitches() << "," << calcTotalNumPreemptions() << ",";
+  os << calcCpuUtilization() << "," << std::endl;
 }

@@ -11,6 +11,8 @@
  *  
  *  Brief:
  *    Entrypoint.
+ * 
+ *  Autograde Score: 71/73 (cap = 60)
  */
 
 #include <stdlib.h>
@@ -18,33 +20,16 @@
 #include <limits>
 #include <string>
 #include <fstream>
-#include "SeqGenerator.hpp"
-#include "Process.hpp"
-#include "RoundRobin.hpp"
-#include "ShortestRemainingTime.hpp"
-
-// 1. rr_add meaning
-
-// 4. Also, is tcs = 0 an invalid input?
-
-// 2. If a process is context switching in and another process arrives from I/O or newly arrived with lower tau, should we print "[new process] will preempt [context switching in process]"? or should 
-// we wait for the context switching in process to first print "[context switching in process] began using CPU" (without actually running any of the context switching in process's code)?
-
-// 3. Also I don't understand why SJF will use "started using the CPU for <rem>ms burst"
-// but SRT will only use "started using the CPU with <rem>ms remaining". 
-
-// Isn't the start of the burst always supposed to be "started using the CPU for <rem>ms burst" 
-
-// and if it resumed the burst after a preemption it should be "started using the CPU with <rem>ms remaining"?
-
-
-
+#include "SeqGenerator.h"
+#include "Process.h"
+#include "RoundRobin.h"
+#include "ShortestRemainingTime.h"
 
 /* [n: number of processes] [seed] [lambda] [limit] [tcs] [alpha] [tslice] [rr_add: BEGINNING or END] */
 int main(int argc, char** argv) {
   
-  if (argc != 8 && argc != 9) {
-    std::cerr << "ERROR: usage [executable] [n: number of processes] [seed] [lambda] [limit] [tcs] [alpha] [tslice] [rr_add: BEGINNING or END]" << std::endl;
+  if (argc != 8 && argc != 9 && argc != 10) {
+    std::cerr << "ERROR: usage [executable] [n: number of processes] [seed] [lambda] [limit] [tcs] [alpha] [tslice] [rr_add: BEGINNING or END <optional>] [-p path: path/to/inputfile <optional>]" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -80,33 +65,42 @@ int main(int argc, char** argv) {
   std::ofstream ofs;
   ofs.open("simout.txt", std::ofstream::out | std::ofstream::trunc);
 
-  std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
+
+ // {\tt [$n$: 2] [seed: 2] [$\lambda$: 0.01] [limit: 256] [$t_{cs}$: 4] [$\alpha$: 0.5] [$t_{slice}$: 128]}  
+  ofs << "{\\tt [$n$: " << n << "] [seed: " << seedval << "] [$\\lambda$: " << lambda << "] [limit: " << maxval;
+  ofs << "] [$t_{cs}$: " << tcs << "] [$\\alpha$: " << alpha << "] [$t_{slice}$: " << tslice << "]";
+  if (argc == 9) {
+    ofs << "[$rr_{add}$: " << *(argv + 8) << "]";
+  }
+  ofs << "}" << std::endl;
+  // std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
+  std::vector<Process> processes = SeqGenerator::parseProcesses("testinputs/cpuBound.txt", lambda, tcs, alpha, tslice);
 
   // FCFS
   RoundRobin fcfs(processes, tslice, tcs, addToEnd, /* FCFS: true */ true);
   fcfs.run(); 
-  fcfs.printInfo(ofs);
+  fcfs.printCsv(ofs);
   fcfs.reset();
   std::cout << std::endl;
 
   // SJF
   ShortestRemainingTime sjf(processes, tcs, /* SJF: true */ true);
   sjf.run();
-  sjf.printInfo(ofs);
+  sjf.printCsv(ofs);
   sjf.reset();
   std::cout << std::endl;
   
   // SRT
   ShortestRemainingTime srt(processes, tcs, /* SRT: false */ false); 
   srt.run();
-  srt.printInfo(ofs);
+  srt.printCsv(ofs);
   srt.reset(); 
   std::cout << std::endl;
 
   // RR
   RoundRobin rr(processes, tslice, tcs, addToEnd, /* RR: false */ false); 
   rr.run();  
-  rr.printInfo(ofs); 
+  rr.printCsv(ofs); 
   rr.reset(); 
 
   ofs.close(); 

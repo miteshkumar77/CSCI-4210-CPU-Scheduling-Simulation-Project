@@ -38,7 +38,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <string>
-#include "globals.hpp"
+#include "globals.h"
 #include <utility>
 #include <functional>
 #include <numeric>
