@@ -72,9 +72,33 @@ much lower average wait times and turnaround times in \textit{SRT} but an almost
 \end{doublespace}
 \section{Limitations of Our Simulation}
 \begin{doublespace}
-Some limitations 
+\begin{enumerate}
+  \item The I/O queue is assumed to be infinitely parallel even though it wouldn't be in reality. 
+  According to our simulation, multiple processes can join the I/O waitin gstates and their I/O waiting timers
+  can simultaneously elapse no matter how many processes are in the I/O waiting state.
+  \item In our simulation, we can only have one process running at a time even though modern processors will have 
+  multiple CPU cores and therefore can have multiple processes running simultaneously.
+  \item Our simulator can only manage up to 26 processes even though a real system may have thousands of processes running. 
+  In order to implement this for thousands of processes, we would have to optimize our print output such that we don't 
+  have to print the queue contents for each event, and optimize our readyQueue to use a heap in our \textit{SJF} and \textit{SRT}
+  algorithms.
+  \item Our simulator doesn't have a way to configure different probability distributions for different input parameters
+  to the process generation. For example, we might want to use an exponential distribution with one particular $\lambda_1 = 0.01$
+  for CPU burst times, and $\lambda_2 = 0.001$ for I/O burst times to indicate that we are simulating a set of mainly I/O bound 
+  processes.
+\end{enumerate}
 \end{doublespace}
 \section{Priority Scheduling Algorithm of Our Own Design}
+\begin{doublespace}
+The team discovered that in CPU bound scenarios, the \textit{RR} algorithm excessively preempts processes, resulting in 
+lower CPU utilizations. This behavior can especially be observed in Table 7. \textit{RR} has the lowest CPU utilization 
+and the highest amount of preemptions. Our algorithm will double the $t_{cs}$ of the process each time it is preempted. 
+Therefore, each process will have an individual $t_{cs}$ assigned to it. This should allow our system to detect 
+CPU boundedness of processes and then adjust accordingly by allowing those processes to use the CPU for an extended amount of time. 
+This should lower the context switch latency while allowing smaller amounts of I/O bound processes to still get through. The 
+disadvantage would be that after many preemptions, we can still get into an occasional condition where there is an I/O bound 
+process that has several CPU bound processes ahead of it in the queue that each have very high $t_{cs}$ values. 
+\end{doublespace}
 \section{Appendix}
 \subsection*{Program Arguments}
 {\tt[executable] [$n$] [seed] [$\lambda$] [limit] [$t_{cs}$] [$\alpha$] [$t_{slice}$] [$rr_{add}$: BEGINNING or END, default: END]}
