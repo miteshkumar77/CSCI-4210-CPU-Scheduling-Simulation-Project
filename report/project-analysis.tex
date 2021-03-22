@@ -34,7 +34,28 @@
 \maketitle
 
 \section{Best Algorithm for CPU-bound vs I/O-bound Processes}
+\begin{doublespace}
+The team collected data for runs consisting of mainly I/O-bound processes which are shown in Tables 1 through 5, 
+and data for runs consisting of mainly CPU-bound processes which are shown in Tables 6 through 10. It can be observed
+that preemptive algorithms have lower average turnaround times and waiting times than their non-preemptive counterparts. 
+This is predicted to be the case due to some processes occasionally having high CPU burst times which would become a 
+bottle neck for the rest of the I/O bound processes. \textit{RR} was not as fast as \textit{SRT}. The team attributes this
+behavior to the increased number of preemptions that \textit{RR} causes (As seen in Table 1 and Table 2) which have a context 
+switch latency. Therefore, the team found that \textit{SRT} was the best suited algorithm for I/O bound processes.
+
+It was found that preemptive algorithms were also better than their non-preemptive counterparts for CPU-bound processes as well.
+Table 7 through Table 9 show \textit{RR} outperforming \textit{SRT} but in Table 10, \textit{SRT} outperforms \textit{RR} because
+the context switch latency is high but the time slice isn't as high. More preemptions in the middle of process execution leads 
+to higher average turn around times for \textit{RR}. Therefore, the team found that \textit{RR} was the best suited algorithm,
+over all, for CPU bound processes.
+
+\end{doublespace}
+
 \section{RR Algorithm With {\tt $rr_{add}$} set to {\tt BEGINNING} vs {\tt END}}
+\begin{doublespace}
+Tables 4,5,9 and 10 show data from runs that have the optional flag {\tt $rr_{add}$:BEGINNING}
+
+\end{doublespace}
 \section{Comparison Between SJF and SRT}
 \section{Limitations of Our Simulation}
 \section{Priority Scheduling Algorithm of Our Own Design}
@@ -54,6 +75,7 @@
   \textit{SRT}       & 286.957                                                                          & 87.5217                                                                     & 378.478                                                                            & 23                                                                                    & 0                                                                                   & 38.5514                                                                    \\ \hline
   \textit{RR}        & 286.957                                                                          & 95.6522                                                                     & 388.87                                                                             & 36                                                                                    & 13                                                                                  & 38.1856                                                                    \\ \hline
   \end{tabular}
+  \label{table:1}
 \end{table}
 
 \begin{table}[h!]
@@ -67,6 +89,7 @@
   \textit{SRT}       & 286.957                                                                          & 87.5217                                                                     & 378.478                                                                            & 23                                                                                    & 0                                                                                   & 38.5514                                                                    \\ \hline
   \textit{RR}        & 286.957                                                                          & 93.6957                                                                     & 389.174                                                                            & 49                                                                                    & 26                                                                                  & 38.1062                                                                    \\ \hline
   \end{tabular}
+  \label{table:2}
 \end{table}
 
 \begin{table}[h!]
@@ -79,6 +102,7 @@
   \textit{SRT}       & 286.957                                                                          & 113.522                                                                     & 405.174                                                                            & 27                                                                                    & 4                                                                                   & 38.5424                                                                    \\ \hline
   \textit{RR}        & 286.957                                                                          & 82.3043                                                                     & 373.261                                                                            & 23                                                                                    & 0                                                                                   & 39.3185                                                                    \\ \hline
   \end{tabular}
+  \label{table:3}
 \end{table}
 
 \begin{table}[h!]
@@ -91,6 +115,7 @@
   \textit{SRT}       & 286.957                                                                          & 113.522                                                                     & 405.174                                                                            & 27                                                                                    & 4                                                                                   & 38.5424                                                                    \\ \hline
   \textit{RR}        & 286.957                                                                          & 156.217                                                                     & 447.174                                                                            & 23                                                                                    & 0                                                                                   & 38.6281                                                                    \\ \hline
   \end{tabular}
+  \label{table:4}
 \end{table}
 
 \begin{table}[h!]
@@ -103,6 +128,7 @@
   \textit{SRT}       & 286.957                                                                          & 106.522                                                                     & 416.087                                                                            & 26                                                                                    & 3                                                                                   & 38.1503                                                                    \\ \hline
   \textit{RR}        & 286.957                                                                          & 163.87                                                                      & 470.826                                                                            & 23                                                                                    & 0                                                                                   & 38.3053                                                                    \\ \hline
   \end{tabular}
+  \label{table:5}
 \end{table}
 
 \begin{table}[h!]
@@ -115,6 +141,7 @@
   \textit{SRT}       & 1629.22                                                                          & 2543.57                                                                     & 4178.17                                                                            & 31                                                                                    & 8                                                                                   & 94.6836                                                                    \\ \hline
   \textit{RR}        & 1629.22                                                                          & 2249.39                                                                     & 3913.57                                                                            & 201                                                                                   & 178                                                                                 & 92.0236                                                                    \\ \hline
   \end{tabular}
+  \label{table:6}
 \end{table}
 
 \begin{table}[h!]
@@ -127,6 +154,7 @@
   \textit{SRT}       & 1629.22                                                                          & 2543.57                                                                     & 4178.17                                                                            & 31                                                                                    & 8                                                                                   & 94.6836                                                                    \\ \hline
   \textit{RR}        & 1629.22                                                                          & 2327.13                                                                     & 4024.17                                                                            & 390                                                                                   & 367                                                                                 & 90.0683                                                                    \\ \hline
   \end{tabular}
+  \label{table:7}
 \end{table}
 
 \begin{table}[h!]
@@ -139,6 +167,7 @@
   \textit{SRT}       & 1629.22                                                                          & 2017.39                                                                     & 3652.35                                                                            & 33                                                                                    & 10                                                                                  & 94.6645                                                                    \\ \hline
   \textit{RR}        & 1629.22                                                                          & 2829.35                                                                     & 4463.78                                                                            & 30                                                                                    & 7                                                                                   & 95.2468                                                                    \\ \hline
   \end{tabular}
+  \label{table:}
 \end{table}
 
 \begin{table}[h!]
@@ -151,6 +180,7 @@
   \textit{SRT}       & 1629.22                                                                          & 2017.39                                                                     & 3652.35                                                                            & 33                                                                                    & 10                                                                                  & 94.6645                                                                    \\ \hline
   \textit{RR}        & 1629.22                                                                          & 1743.61                                                                     & 3378.04                                                                            & 30                                                                                    & 7                                                                                   & 95.6162                                                                    \\ \hline
   \end{tabular}
+  \label{table:8}
 \end{table}
 
 \begin{table}[]
@@ -163,5 +193,6 @@
   \textit{SRT}       & 1629.22                                                                          & 2057.74                                                                     & 3715.65                                                                            & 33                                                                                    & 10                                                                                  & 93.4184                                                                    \\ \hline
   \textit{RR}        & 1629.22                                                                          & 2876.65                                                                     & 4531.96                                                                            & 30                                                                                    & 7                                                                                   & 94.0987                                                                    \\ \hline
 \end{tabular}
+\label{table:nine}
 \end{table}
 \end{document}
