@@ -17,7 +17,7 @@
 #define GLOBALS_HPP
 
 #include <limits>
-
+#define DISPLAY_MAX_T 999
 #ifndef DISPLAY_MAX_T
 #define MAX_OUTPUT_TS std::numeric_limits<unsigned int>::max()
 #else

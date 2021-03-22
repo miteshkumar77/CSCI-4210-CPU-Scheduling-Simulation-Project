@@ -67,40 +67,44 @@ int main(int argc, char** argv) {
 
 
  // {\tt [$n$: 2] [seed: 2] [$\lambda$: 0.01] [limit: 256] [$t_{cs}$: 4] [$\alpha$: 0.5] [$t_{slice}$: 128]}  
-  ofs << "{\\tt [$n$: " << n << "] [seed: " << seedval << "] [$\\lambda$: " << lambda << "] [limit: " << maxval;
-  ofs << "] [$t_{cs}$: " << tcs << "] [$\\alpha$: " << alpha << "] [$t_{slice}$: " << tslice << "]";
-  if (argc == 9) {
-    ofs << "[$rr_{add}$: " << *(argv + 8) << "]";
-  }
-  ofs << "}" << std::endl;
-  // std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
-  std::vector<Process> processes = SeqGenerator::parseProcesses("testinputs/mostlyIoBound.txt", lambda, tcs, alpha, tslice);
+  // ofs << "{\\tt [$n$: " << n << "] [seed: " << seedval << "] [$\\lambda$: " << lambda << "] [limit: " << maxval;
+  // ofs << "] [$t_{cs}$: " << tcs << "] [$\\alpha$: " << alpha << "] [$t_{slice}$: " << tslice << "]";
+  // if (argc == 9) {
+  //   ofs << "[$rr_{add}$: " << *(argv + 8) << "]";
+  // }
+  // ofs << "}" << std::endl;
+  std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
+  // std::vector<Process> processes = SeqGenerator::parseProcesses("testinputs/mostlyIoBound.txt", lambda, tcs, alpha, tslice);
 
   // FCFS
   RoundRobin fcfs(processes, tslice, tcs, addToEnd, /* FCFS: true */ true);
   fcfs.run(); 
-  fcfs.printCsv(ofs);
+  // fcfs.printCsv(ofs);
+  fcfs.printInfo(ofs);
   fcfs.reset();
   std::cout << std::endl;
 
   // SJF
   ShortestRemainingTime sjf(processes, tcs, /* SJF: true */ true);
   sjf.run();
-  sjf.printCsv(ofs);
+  // sjf.printCsv(ofs);
+  sjf.printInfo(ofs);
   sjf.reset();
   std::cout << std::endl;
   
   // SRT
   ShortestRemainingTime srt(processes, tcs, /* SRT: false */ false); 
   srt.run();
-  srt.printCsv(ofs);
+  // srt.printCsv(ofs);
+  srt.printInfo(ofs);
   srt.reset(); 
   std::cout << std::endl;
 
   // RR
   RoundRobin rr(processes, tslice, tcs, addToEnd, /* RR: false */ false); 
   rr.run();  
-  rr.printCsv(ofs); 
+  // rr.printCsv(ofs); 
+  rr.printInfo(ofs);
   rr.reset(); 
 
   ofs.close(); 

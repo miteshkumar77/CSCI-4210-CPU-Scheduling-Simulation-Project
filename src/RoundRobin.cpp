@@ -233,7 +233,11 @@ void RoundRobin::run() {
         switchingOutProc = nullProc;
       } else if (switchingOutProc -> getState() == Process::State::SW_READY) {
         printEvent(switchingOutProc -> nextState(timestamp, tcs), false);
-        pushLastReady(switchingOutProc);
+        if (addToEnd) {
+          pushLastReady(switchingOutProc);
+        } else {
+          pushFirstReady(switchingOutProc); 
+        }
         switchingOutProc = nullProc;
       } else if (switchingOutProc -> getState() == Process::State::SW_TERM) {
         printEvent(switchingOutProc -> nextState(timestamp, tcs), true);
