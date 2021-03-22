@@ -22,7 +22,7 @@
  }
 
 
-\newcommand{\sectionbreak}{\clearpage}
+% \newcommand{\sectionbreak}{\clearpage}
 
 \title{\textbf{Simulation Project Analysis} \\ 
        \textbf{CSCI-4210} \\ 
@@ -35,29 +35,45 @@
 
 \section{Best Algorithm for CPU-bound vs I/O-bound Processes}
 \begin{doublespace}
-The team collected data for runs consisting of mainly I/O-bound processes which are shown in Tables 1 through 5, 
-and data for runs consisting of mainly CPU-bound processes which are shown in Tables 6 through 10. It can be observed
-that preemptive algorithms have lower average turnaround times and waiting times than their non-preemptive counterparts. 
-This is predicted to be the case due to some processes occasionally having high CPU burst times which would become a 
-bottle neck for the rest of the I/O bound processes. \textit{RR} was not as fast as \textit{SRT}. The team attributes this
-behavior to the increased number of preemptions that \textit{RR} causes (As seen in Table 1 and Table 2) which have a context 
-switch latency. Therefore, the team found that \textit{SRT} was the best suited algorithm for I/O bound processes.
 
-It was found that preemptive algorithms were also better than their non-preemptive counterparts for CPU-bound processes as well.
-Table 7 through Table 9 show \textit{RR} outperforming \textit{SRT} but in Table 10, \textit{SRT} outperforms \textit{RR} because
-the context switch latency is high but the time slice isn't as high. More preemptions in the middle of process execution leads 
-to higher average turn around times for \textit{RR}. Therefore, the team found that \textit{RR} was the best suited algorithm,
-over all, for CPU bound processes.
+Table 6 shows the behavior of each algorithm when all processes are CPU bound. \textit{RR} is the best performing
+algorithm for this test as it has the lowest average wait time of $2249.39$ ms and the lowest average turnaround 
+time of $3913.57$ ms.
 
+Table 12 shows the behavior of each algorithm when the majority of processes are CPU bound and when there are some 
+I/O bound processes intermixed. Here, the best performing algorithm is \textit{SRT} as it had the lowest 
+average wait time and the lowest average turnaround time. Since the second scenario is much more representative of 
+a real case, the team argues that \textit{SRT} is the best algorithm for CPU bound processes.
+
+Table 1 shows the behavior of each algorithm when all processes are I/O bound. \textit{FCFS} seems to be the best 
+performing algorithm as it has the lowest average wait times, turnaround times, and a middle CPU utilization percentage.
+
+Table 14 shows the behavior of each algorithm when the majority of processes are I/O bound, but a few are CPU bound. We 
+can see that \textit{FCFS} is not nearly as good now because some short CPU burst processes get blocked behind the 
+sparse set of CPU bound processes. Here \textit{SRT} seems to be the best algorithm as it has the lowest average wait time
+and lowest average turnaround time. Therefore, the team argues that, as Table 14 represents a more common scenario, the \textit{SRT}
+algorithm is the best suited for I/O bound processes.
 \end{doublespace}
 
 \section{RR Algorithm With {\tt $rr_{add}$} set to {\tt BEGINNING} vs {\tt END}}
 \begin{doublespace}
-Tables 4,5,9 and 10 show data from runs that have the optional flag {\tt $rr_{add}$:BEGINNING}
-
+Tables 4,5,9 and 10 show data from runs that have the optional flag {\tt $rr_{add}$:BEGINNING}. 
+By comparing the results for algorithm \textit{RR} in  Table 3 and Table 4, which have the same configurations except for {\tt $rr_{add}$:BEGINNING}, 
+the team found that {\tt $rr_{add}$:BEGINNING} raised the average wait time and the average turn around time, and it decreased the 
+CPU utilization. We can therefore say that {\tt $rr_{add}$:END} is better here. 
 \end{doublespace}
 \section{Comparison Between SJF and SRT}
+\begin{doublespace}
+The preemption added to \textit{SJF} tends to lower average waiting times and average turnaround time while lowering
+CPU utilization. This difference in CPU utilization is more pronounced when there are higher context switch latencies. 
+This is because \textit{SRT} will always have more context switching than \textit{SJF}. Although \textit{SRT} is fairer,
+the preemptions cause a drop in CPU utilization. We can see this in the results from Table 14 where we have 
+much lower average wait times and turnaround times in \textit{SRT} but an almost 3\% worse CPU utilization. 
+\end{doublespace}
 \section{Limitations of Our Simulation}
+\begin{doublespace}
+Some limitations 
+\end{doublespace}
 \section{Priority Scheduling Algorithm of Our Own Design}
 \section{Appendix}
 \subsection*{Program Arguments}
@@ -167,7 +183,7 @@ Tables 4,5,9 and 10 show data from runs that have the optional flag {\tt $rr_{ad
   \textit{SRT}       & 1629.22                                                                          & 2017.39                                                                     & 3652.35                                                                            & 33                                                                                    & 10                                                                                  & 94.6645                                                                    \\ \hline
   \textit{RR}        & 1629.22                                                                          & 2829.35                                                                     & 4463.78                                                                            & 30                                                                                    & 7                                                                                   & 95.2468                                                                    \\ \hline
   \end{tabular}
-  \label{table:}
+  \label{table:8}
 \end{table}
 
 \begin{table}[h!]
@@ -180,7 +196,7 @@ Tables 4,5,9 and 10 show data from runs that have the optional flag {\tt $rr_{ad
   \textit{SRT}       & 1629.22                                                                          & 2017.39                                                                     & 3652.35                                                                            & 33                                                                                    & 10                                                                                  & 94.6645                                                                    \\ \hline
   \textit{RR}        & 1629.22                                                                          & 1743.61                                                                     & 3378.04                                                                            & 30                                                                                    & 7                                                                                   & 95.6162                                                                    \\ \hline
   \end{tabular}
-  \label{table:8}
+  \label{table:9}
 \end{table}
 
 \begin{table}[]
@@ -193,6 +209,59 @@ Tables 4,5,9 and 10 show data from runs that have the optional flag {\tt $rr_{ad
   \textit{SRT}       & 1629.22                                                                          & 2057.74                                                                     & 3715.65                                                                            & 33                                                                                    & 10                                                                                  & 93.4184                                                                    \\ \hline
   \textit{RR}        & 1629.22                                                                          & 2876.65                                                                     & 4531.96                                                                            & 30                                                                                    & 7                                                                                   & 94.0987                                                                    \\ \hline
 \end{tabular}
-\label{table:nine}
+\label{table:10}
 \end{table}
+
+\begin{table}[]
+  \caption{Mostly CPU bound {\tt [$n$: 8] [seed: 64] [$\lambda$: 0.001] [limit: 4096] [$t_{cs}$: 20] [$\alpha$: 0.5] [$t_{slice}$: 2048]}}
+  \begin{tabular}{|l|l|l|l|l|l|l|}
+  \hline
+  \textbf{Algorithm} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ CPU Burst\\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ Wait\\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ Turnaround \\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Total Number\\ of Context\\ Switches\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Total \\ Number\\ of\\ Preemptions\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}CPU\\ Utilization \\ (\%)\end{tabular}} \\ \hline
+  \textit{FCFS}      & 1256.77                                                                          & 3088.9                                                                      & 4365.67                                                                            & 30                                                                                    & 0                                                                                   & 63.1108                                                                    \\ \hline
+  \textit{SJF}       & 1256.77                                                                          & 2744.7                                                                      & 4021.47                                                                            & 30                                                                                    & 0                                                                                   & 61.9799                                                                    \\ \hline
+  \textit{SRT}       & 1256.77                                                                          & 1960.37                                                                     & 3245.13                                                                            & 42                                                                                    & 12                                                                                  & 70.4413                                                                    \\ \hline
+  \textit{RR}        & 1256.77                                                                          & 2608.07                                                                     & 3890.17                                                                            & 38                                                                                    & 8                                                                                   & 69.7958                                                                    \\ \hline
+  \end{tabular}
+  \label{table:11}
+\end{table}
+
+\begin{table}[]
+  \caption{Mostly CPU bound {\tt [$n$: 8] [seed: 64] [$\lambda$: 0.001] [limit: 4096] [$t_{cs}$: 4] [$\alpha$: 0.5] [$t_{slice}$: 2048]}}
+  \begin{tabular}{|l|l|l|l|l|l|l|}
+  \hline
+  \textbf{Algorithm} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ CPU Burst\\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ Wait\\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ Turnaround \\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Total Number\\ of Context\\ Switches\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Total \\ Number\\ of\\ Preemptions\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}CPU\\ Utilization \\ (\%)\end{tabular}} \\ \hline
+  \textit{FCFS}      & 1256.77                                                                          & 3041.43                                                                     & 4302.2                                                                             & 30                                                                                    & 0                                                                                   & 63.6219                                                                    \\ \hline
+  \textit{SJF}       & 1256.77                                                                          & 2703.63                                                                     & 3964.4                                                                             & 30                                                                                    & 0                                                                                   & 62.4729                                                                    \\ \hline
+  \textit{SRT}       & 1256.77                                                                          & 2161.47                                                                     & 3423.57                                                                            & 40                                                                                    & 10                                                                                  & 62.1946                                                                    \\ \hline
+  \textit{RR}        & 1256.77                                                                          & 2549.93                                                                     & 3811.77                                                                            & 38                                                                                    & 8                                                                                   & 70.5692                                                                    \\ \hline
+  \end{tabular}
+  \label{table:12}
+\end{table}
+
+\begin{table}[]
+  \caption{Mostly I/O bound {\tt [$n$: 8] [seed: 64] [$\lambda$: 0.001] [limit: 4096] [$t_{cs}$: 20] [$\alpha$: 0.5] [$t_{slice}$: 2048]}}
+  \begin{tabular}{|l|l|l|l|l|l|l|}
+  \hline
+  \textbf{Algorithm} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ CPU Burst\\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ Wait\\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ Turnaround \\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Total Number\\ of Context\\ Switches\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Total \\ Number\\ of\\ Preemptions\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}CPU\\ Utilization \\ (\%)\end{tabular}} \\ \hline
+  \textit{FCFS}      & 1256.77                                                                          & 3088.9                                                                      & 4365.67                                                                            & 30                                                                                    & 0                                                                                   & 63.1108                                                                    \\ \hline
+  \textit{SJF}       & 1256.77                                                                          & 2744.7                                                                      & 4021.47                                                                            & 30                                                                                    & 0                                                                                   & 61.9799                                                                    \\ \hline
+  \textit{SRT}       & 1256.77                                                                          & 1960.37                                                                     & 3245.13                                                                            & 42                                                                                    & 12                                                                                  & 70.4413                                                                    \\ \hline
+  \textit{RR}        & 1256.77                                                                          & 2608.07                                                                     & 3890.17                                                                            & 38                                                                                    & 8                                                                                   & 69.7958                                                                    \\ \hline
+  \end{tabular}
+  \label{table:13}
+\end{table}
+
+\begin{table}[]
+  \caption{Mostly I/O bound {\tt [$n$: 8] [seed: 64] [$\lambda$: 0.001] [limit: 4096] [$t_{cs}$: 4] [$\alpha$: 0.5] [$t_{slice}$: 2048]}}
+  \begin{tabular}{|l|l|l|l|l|l|l|}
+  \hline
+  \textbf{Algorithm} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ CPU Burst\\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ Wait\\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Average\\ Turnaround \\ Time (ms)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Total Number\\ of Context\\ Switches\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Total \\ Number\\ of\\ Preemptions\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}CPU\\ Utilization \\ (\%)\end{tabular}} \\ \hline
+  \textit{FCFS}      & 1710.3                                                                           & 3412.33                                                                     & 5126.63                                                                            & 30                                                                                    & 0                                                                                   & 99.4187                                                                    \\ \hline
+  \textit{SJF}       & 1710.3                                                                           & 2505.97                                                                     & 4220.27                                                                            & 30                                                                                    & 0                                                                                   & 99.1842                                                                    \\ \hline
+  \textit{SRT}       & 1710.3                                                                           & 756                                                                         & 2472.03                                                                            & 43                                                                                    & 13                                                                                  & 96.731                                                                     \\ \hline
+  \textit{RR}        & 1710.3                                                                           & 1314.93                                                                     & 3030.17                                                                            & 37                                                                                    & 7                                                                                   & 96.8295                                                                    \\ \hline
+  \end{tabular}
+  \label{table:14}
+\end{table}
+
 \end{document}

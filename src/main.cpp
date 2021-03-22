@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
   }
   ofs << "}" << std::endl;
   // std::vector<Process> processes = SeqGenerator::generateProccesses(n, lambda, maxval, seedval, alpha); 
-  std::vector<Process> processes = SeqGenerator::parseProcesses("testinputs/cpuBound.txt", lambda, tcs, alpha, tslice);
+  std::vector<Process> processes = SeqGenerator::parseProcesses("testinputs/mostlyIoBound.txt", lambda, tcs, alpha, tslice);
 
   // FCFS
   RoundRobin fcfs(processes, tslice, tcs, addToEnd, /* FCFS: true */ true);
