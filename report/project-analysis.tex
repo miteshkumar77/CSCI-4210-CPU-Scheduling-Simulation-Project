@@ -45,7 +45,9 @@ time of $3913.57$ ms.
 
 Table 12 shows the behavior of each algorithm when the majority of processes are CPU bound and when there are some 
 I/O bound processes intermixed. Here, the best performing algorithm is \textit{SRT} as it had the lowest 
-average wait time and the lowest average turnaround time. Since the second scenario is much more representative of 
+average wait time and the lowest average turnaround time. Table 12 also shows that \textit{SRT}
+has lower the lowest average turnaround time which is desirable for CPU bound processes as we want
+to finish computation as fast as possible. Since the second scenario is much more representative of 
 a real case, the team argues that \textit{SRT} is the best algorithm for CPU bound processes.
 
 Table 1 shows the behavior of each algorithm when all processes are I/O bound. \textit{FCFS} seems to be the best 
@@ -54,7 +56,10 @@ performing algorithm as it has the lowest average wait times, turnaround times, 
 Table 14 shows the behavior of each algorithm when the majority of processes are I/O bound, but a few are CPU bound. We 
 can see that \textit{FCFS} is not nearly as good now because some short CPU burst processes get blocked behind the 
 sparse set of CPU bound processes. Here \textit{SRT} seems to be the best algorithm as it has the lowest average wait time
-and lowest average turnaround time. Therefore, the team argues that, as Table 14 represents a more common scenario, the \textit{SRT}
+and lowest average turnaround time. Table 14 also shows that
+\textit{SRT} exhibits the lowest average waiting time. This is important for I/O bound processes
+as they are typically interactive and we don't want users to wait too long for them to finish their bursts.
+Therefore, the team argues that, as Table 14 represents a more common scenario, the \textit{SRT}
 algorithm is the best suited for I/O bound processes.
 \end{doublespace}
 
