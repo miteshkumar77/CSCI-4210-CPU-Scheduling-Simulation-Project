@@ -4,10 +4,8 @@
  *
  *  Simulation Project - RoundRobin.cpp
  *
- *  Authors:
+ *  Author:
  *    Mitesh Kumar  [ kumarm4 ]
- *    Jason Lam     [  lamj7  ]
- *    William He    [  hew7   ]
  */
 
 #include "RoundRobin.hpp"

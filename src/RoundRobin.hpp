@@ -4,10 +4,8 @@
  *
  *  Simulation Project - RoundRobin.hpp
  *
- *  Authors:
+ *  Author:
  *    Mitesh Kumar  [ kumarm4 ]
- *    Jason Lam     [  lamj7  ]
- *    William He    [  hew7   ]
  *
  *  Brief:
  *    Implementation of Round Robin (RR) scheduling algorithm that can be

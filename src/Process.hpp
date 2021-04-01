@@ -4,10 +4,8 @@
  *
  *  Simulation Project - Process.hpp
  *
- *  Authors:
+ *  Author:
  *    Mitesh Kumar  [ kumarm4 ]
- *    Jason Lam     [  lamj7  ]
- *    William He    [  hew7   ]
  *
  *  Brief:
  *    Represents the process objects. Only allows the creation of up to 26

@@ -4,10 +4,8 @@
  *
  *  Simulation Project - globals.hpp
  *
- *  Authors:
+ *  Author:
  *    Mitesh Kumar  [ kumarm4 ]
- *    Jason Lam     [  lamj7  ]
- *    William He    [  hew7   ]
  *
  *  Brief:
  *    Place to store any global constants defined at compile time (e.g.
